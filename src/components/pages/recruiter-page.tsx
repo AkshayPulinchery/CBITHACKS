@@ -14,12 +14,7 @@ import type { RankedCandidate } from '@/lib/types';
 import AuthButton from '@/components/auth-button';
 
 export default function RecruiterPage() {
-  const [jobInputs, setJobInputs] = useState({
-    jobTitle: '',
-    requiredSkills: '',
-    experienceKeywords: '',
-    technologies: '',
-  });
+  const [jobDescription, setJobDescription] = useState('');
   const [candidates, setCandidates] = useState<RankedCandidate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,9 +22,34 @@ export default function RecruiterPage() {
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<number[]>([]);
   const { toast } = useToast();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setJobInputs(prev => ({ ...prev, [name]: value }));
+  const handleJobDescriptionChange = (value: string) => {
+    setJobDescription(value);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target?.result as string;
+      setJobDescription(text);
+      toast({
+        title: "File loaded",
+        description: `Successfully loaded ${file.name}.`,
+      });
+    };
+    reader.onerror = () => {
+        toast({
+            variant: "destructive",
+            title: "File error",
+            description: "There was an error reading the file.",
+        });
+    }
+    reader.readAsText(file);
+
+    // Reset file input to allow re-uploading the same file
+    e.target.value = '';
   };
 
   const handleCandidateSelect = (candidateId: number) => {
@@ -62,13 +82,6 @@ export default function RecruiterPage() {
     setCandidates([]);
     setSelectedCandidateIds([]);
     
-    const jobDescription = `
-      Job Title: ${jobInputs.jobTitle}. 
-      Required Skills: ${jobInputs.requiredSkills}. 
-      Experience Keywords: ${jobInputs.experienceKeywords}. 
-      Technologies: ${jobInputs.technologies}.
-    `;
-    
     const result = await getRankedCandidates(jobDescription);
     if ('error' in result) {
       setError(result.error);
@@ -96,8 +109,9 @@ export default function RecruiterPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-2">
             <JobDescriptionForm
-              jobInputs={jobInputs}
-              onInputChange={handleInputChange}
+              jobDescription={jobDescription}
+              onJobDescriptionChange={handleJobDescriptionChange}
+              onFileChange={handleFileChange}
               onSubmit={handleSubmit}
               isLoading={isLoading}
             />

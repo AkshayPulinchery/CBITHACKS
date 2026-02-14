@@ -1,6 +1,7 @@
 'use client';
 
-import { FileText, Loader2 } from 'lucide-react';
+import React from 'react';
+import { FileText, Loader2, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -12,25 +13,25 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
 interface JobDescriptionFormProps {
-  jobInputs: {
-    jobTitle: string;
-    requiredSkills: string;
-    experienceKeywords: string;
-    technologies: string;
-  };
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  jobDescription: string;
+  onJobDescriptionChange: (value: string) => void;
+  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
   isLoading: boolean;
 }
 
 export default function JobDescriptionForm({
-  jobInputs,
-  onInputChange,
+  jobDescription,
+  onJobDescriptionChange,
+  onFileChange,
   onSubmit,
   isLoading,
 }: JobDescriptionFormProps) {
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   return (
     <Card>
       <CardHeader>
@@ -39,62 +40,58 @@ export default function JobDescriptionForm({
           Job Description
         </CardTitle>
         <CardDescription>
-          Enter the details for the role you are looking to fill.
+          Paste the full job description below, or upload a text file.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4">
+        <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="jobTitle">Job Title</Label>
-            <Input
-              id="jobTitle"
-              name="jobTitle"
-              placeholder="e.g., Senior React Developer"
-              value={jobInputs.jobTitle}
-              onChange={onInputChange}
+            <Label htmlFor="jobDescription">Full Job Description</Label>
+            <Textarea
+              id="jobDescription"
+              name="jobDescription"
+              placeholder="e.g., We're looking for a Senior React Developer with 5+ years of experience in building modern web applications with React, TypeScript, and Node.js..."
+              value={jobDescription}
+              onChange={(e) => onJobDescriptionChange(e.target.value)}
               disabled={isLoading}
+              rows={15}
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="requiredSkills">Required Skills</Label>
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                    Or
+                </span>
+            </div>
+          </div>
+          <div>
             <Input
-              id="requiredSkills"
-              name="requiredSkills"
-              placeholder="e.g., JavaScript, TypeScript, Team Leadership"
-              value={jobInputs.requiredSkills}
-              onChange={onInputChange}
+              id="file-upload"
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={onFileChange}
+              accept=".txt,.md"
               disabled={isLoading}
             />
-            <p className="text-xs text-muted-foreground">Comma-separated skills.</p>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="experienceKeywords">Experience Keywords</Label>
-            <Input
-              id="experienceKeywords"
-              name="experienceKeywords"
-              placeholder="e.g., 5+ years, startup experience, agile"
-              value={jobInputs.experienceKeywords}
-              onChange={onInputChange}
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
               disabled={isLoading}
-            />
-            <p className="text-xs text-muted-foreground">Comma-separated keywords.</p>
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Upload from File (.txt, .md)
+            </Button>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="technologies">Technologies</Label>
-            <Input
-              id="technologies"
-              name="technologies"
-              placeholder="e.g., React, Node.js, AWS, Docker"
-              value={jobInputs.technologies}
-              onChange={onInputChange}
-              disabled={isLoading}
-            />
-            <p className="text-xs text-muted-foreground">Comma-separated technologies.</p>
-          </div>
-        </form>
+        </div>
       </CardContent>
       <CardFooter>
-        <Button onClick={onSubmit} disabled={isLoading || !jobInputs.jobTitle} className="w-full">
+        <Button onClick={onSubmit} disabled={isLoading || !jobDescription} className="w-full">
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
