@@ -62,5 +62,65 @@
       {"name": "kubernetes-config", "tech": ["Kubernetes", "YAML"]}
     ],
     "linkedinSkills": ["Go", "Python", "AWS", "Docker", "Kubernetes", "gRPC"]
+  },
+  {
+    "id": 6,
+    "name": "Anjali Desai",
+    "avatarUrl": "https://picsum.photos/seed/avatar6/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 350,
+    "githubRepos": [
+      {"name": "spring-boot-microservice", "tech": ["Java", "Spring Boot", "Maven"]},
+      {"name": "api-gateway", "tech": ["Java", "Spring Cloud"]}
+    ],
+    "linkedinSkills": ["Java", "Spring Boot", "Microservices", "SQL", "JPA"]
+  },
+  {
+    "id": 7,
+    "name": "Vikram Rathod",
+    "avatarUrl": "https://picsum.photos/seed/avatar7/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 180,
+    "githubRepos": [
+      {"name": "angular-dashboard", "tech": ["Angular", "TypeScript", "SCSS"]},
+      {"name": "rxjs-state-management", "tech": ["Angular", "RxJS", "NgRx"]}
+    ],
+    "linkedinSkills": ["Angular", "TypeScript", "RxJS", "HTML", "SCSS"]
+  },
+  {
+    "id": 8,
+    "name": "Sunita Patil",
+    "avatarUrl": "https://picsum.photos/seed/avatar8/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 80,
+    "githubRepos": [
+      {"name": "ml-prediction-model", "tech": ["Python", "Pandas", "Scikit-learn"]},
+      {"name": "data-analysis-notebooks", "tech": ["Jupyter", "Matplotlib"]}
+    ],
+    "linkedinSkills": ["Python", "Data Science", "Machine Learning", "Pandas", "NumPy"]
+  },
+  {
+    "id": 9,
+    "name": "Manish Joshi",
+    "avatarUrl": "https://picsum.photos/seed/avatar9/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 250,
+    "githubRepos": [
+      {"name": "vue-firebase-app", "tech": ["Vue.js", "Firebase", "Vite"]},
+      {"name": "pwa-weather-app", "tech": ["Vue.js", "JavaScript"]}
+    ],
+    "linkedinSkills": ["Vue.js", "JavaScript", "Firebase", "HTML", "CSS"]
+  },
+  {
+    "id": 10,
+    "name": "Kavita Reddy",
+    "avatarUrl": "https://picsum.photos/seed/avatar10/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 50,
+    "githubRepos": [
+      {"name": "selenium-automation-framework", "tech": ["Java", "Selenium", "TestNG"]},
+      {"name": "cypress-e2e-tests", "tech": ["Cypress", "JavaScript", "TypeScript"]}
+    ],
+    "linkedinSkills": ["QA Automation", "Selenium", "Cypress", "Java", "JavaScript", "CI/CD"]
   }
 ]
