@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { UsersRound, AlertCircle, Send } from 'lucide-react';
+import { UsersRound, AlertCircle, Send, Sparkles } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import JobDescriptionForm from '@/components/job-description-form';
 import CandidateTable from '@/components/candidate-table';
@@ -13,8 +15,38 @@ import { getRankedCandidates } from '@/app/actions';
 import type { RankedCandidate } from '@/lib/types';
 import AuthButton from '@/components/auth-button';
 
+const AITopPick = ({ candidate, onSelect }: { candidate: RankedCandidate, onSelect: (c: RankedCandidate) => void }) => (
+    <Card className="mb-4 border-primary/50 border-2 shadow-lg">
+        <CardHeader>
+            <CardTitle className="font-headline flex items-center gap-2"><Sparkles className="w-6 h-6 text-primary" /> AI Top Pick</CardTitle>
+            <CardDescription>Our AI has identified this candidate as the strongest match for this role.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className="flex items-center justify-between gap-4">
+                 <div className="flex items-center gap-4">
+                    <Avatar className="h-12 w-12">
+                        <AvatarImage src={candidate.avatarUrl} alt={candidate.name} />
+                        <AvatarFallback>{candidate.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                        <p className="font-bold text-lg">{candidate.name}</p>
+                        <p className="text-sm text-muted-foreground italic">"{candidate.keyStrength}"</p>
+                    </div>
+                </div>
+                <div className="text-right flex-shrink-0">
+                    <p className="text-3xl font-bold text-primary">{candidate.totalScore}</p>
+                    <p className="text-xs text-muted-foreground">Suitability Score</p>
+                </div>
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Button className="w-full" variant="outline" onClick={() => onSelect(candidate)}>View Full Profile</Button>
+        </CardFooter>
+    </Card>
+);
+
 export default function RecruiterPage() {
-  const [jobDescription, setJobDescription] = useState('');
+  const [jobDetails, setJobDetails] = useState({ title: '', responsibilities: '', qualifications: '' });
   const [candidates, setCandidates] = useState<RankedCandidate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,34 +54,8 @@ export default function RecruiterPage() {
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<number[]>([]);
   const { toast } = useToast();
 
-  const handleJobDescriptionChange = (value: string) => {
-    setJobDescription(value);
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      setJobDescription(text);
-      toast({
-        title: "File loaded",
-        description: `Successfully loaded ${file.name}.`,
-      });
-    };
-    reader.onerror = () => {
-        toast({
-            variant: "destructive",
-            title: "File error",
-            description: "There was an error reading the file.",
-        });
-    }
-    reader.readAsText(file);
-
-    // Reset file input to allow re-uploading the same file
-    e.target.value = '';
+  const handleJobDetailsChange = (fieldName: string, value: string) => {
+    setJobDetails(prev => ({ ...prev, [fieldName]: value }));
   };
 
   const handleCandidateSelect = (candidateId: number) => {
@@ -81,6 +87,16 @@ export default function RecruiterPage() {
     setError(null);
     setCandidates([]);
     setSelectedCandidateIds([]);
+
+    const jobDescription = `
+      Job Title: ${jobDetails.title}
+
+      Key Responsibilities:
+      ${jobDetails.responsibilities}
+
+      Required Skills & Qualifications:
+      ${jobDetails.qualifications}
+    `;
     
     const result = await getRankedCandidates(jobDescription);
     if ('error' in result) {
@@ -109,9 +125,8 @@ export default function RecruiterPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-2">
             <JobDescriptionForm
-              jobDescription={jobDescription}
-              onJobDescriptionChange={handleJobDescriptionChange}
-              onFileChange={handleFileChange}
+              jobDetails={jobDetails}
+              onJobDetailsChange={handleJobDetailsChange}
               onSubmit={handleSubmit}
               isLoading={isLoading}
             />
@@ -125,9 +140,13 @@ export default function RecruiterPage() {
               </Alert>
             )}
 
-            {selectedCandidateIds.length > 0 && (
+            {!isLoading && candidates.length > 0 && (
+                <AITopPick candidate={candidates[0]} onSelect={setSelectedCandidate} />
+            )}
+
+            {candidates.length > 0 && !isLoading && (
               <div className="flex justify-end mb-4">
-                <Button onClick={handleSendInvitation}>
+                <Button onClick={handleSendInvitation} disabled={selectedCandidateIds.length === 0}>
                   <Send className="mr-2 h-4 w-4" />
                   Send Interview Invitation ({selectedCandidateIds.length})
                 </Button>
