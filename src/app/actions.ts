@@ -105,7 +105,7 @@ export async function getRankedCandidates(
   } catch (error) {
     console.error("Error in getRankedCandidates:", error);
     if (error instanceof Error && error.message.includes('RESOURCE_EXHAUSTED')) {
-      return { error: "The request could not be processed due to API rate limits. Please try again in a few moments." };
+      return { error: "The request failed due to API rate limits. This usually means the Vertex AI API is not enabled or billing is not set up for your Google Cloud project. Please visit the Google Cloud console for project 'skillrank-ai', enable the Vertex AI API, and ensure a billing account is linked." };
     }
     return { error: "An unexpected error occurred while ranking candidates. Please try again." };
   }
