@@ -2,8 +2,10 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { UsersRound, AlertCircle } from 'lucide-react';
+import { UsersRound, AlertCircle, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import JobDescriptionForm from '@/components/job-description-form';
 import CandidateTable from '@/components/candidate-table';
 import CandidateDetailsDialog from '@/components/candidate-details-dialog';
@@ -22,16 +24,43 @@ export default function RecruiterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<RankedCandidate | null>(null);
+  const [selectedCandidateIds, setSelectedCandidateIds] = useState<number[]>([]);
+  const { toast } = useToast();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setJobInputs(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleCandidateSelect = (candidateId: number) => {
+    setSelectedCandidateIds(prev =>
+      prev.includes(candidateId)
+        ? prev.filter(id => id !== candidateId)
+        : [...prev, candidateId]
+    );
+  };
+
+  const handleSelectAll = () => {
+    if (selectedCandidateIds.length === candidates.length) {
+      setSelectedCandidateIds([]);
+    } else {
+      setSelectedCandidateIds(candidates.map(c => c.id));
+    }
+  };
+  
+  const handleSendInvitation = () => {
+    toast({
+      title: "Invitations Sent!",
+      description: `Interview invitations have been sent to ${selectedCandidateIds.length} candidate(s).`,
+    });
+    setSelectedCandidateIds([]);
+  };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
     setCandidates([]);
+    setSelectedCandidateIds([]);
     
     const jobDescription = `
       Job Title: ${jobInputs.jobTitle}. 
@@ -81,10 +110,23 @@ export default function RecruiterPage() {
                   <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
+
+            {selectedCandidateIds.length > 0 && (
+              <div className="flex justify-end mb-4">
+                <Button onClick={handleSendInvitation}>
+                  <Send className="mr-2 h-4 w-4" />
+                  Send Interview Invitation ({selectedCandidateIds.length})
+                </Button>
+              </div>
+            )}
+
             <CandidateTable
               candidates={candidates}
               isLoading={isLoading}
-              onSelectCandidate={setSelectedCandidate}
+              onRowClick={setSelectedCandidate}
+              selectedIds={selectedCandidateIds}
+              onSelect={handleCandidateSelect}
+              onSelectAll={handleSelectAll}
             />
           </div>
         </div>

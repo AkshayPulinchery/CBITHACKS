@@ -19,12 +19,16 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import type { RankedCandidate } from '@/lib/types';
 
 interface CandidateTableProps {
   candidates: RankedCandidate[];
   isLoading: boolean;
-  onSelectCandidate: (candidate: RankedCandidate) => void;
+  onRowClick: (candidate: RankedCandidate) => void;
+  selectedIds: number[];
+  onSelect: (candidateId: number) => void;
+  onSelectAll: () => void;
 }
 
 const getScoreBadgeVariant = (score: number) => {
@@ -38,6 +42,9 @@ function TableSkeleton() {
     <>
       {[...Array(5)].map((_, i) => (
         <TableRow key={i}>
+          <TableCell className="px-4">
+            <Skeleton className="h-4 w-4" />
+          </TableCell>
           <TableCell>
             <Skeleton className="h-6 w-6 rounded-full" />
           </TableCell>
@@ -62,9 +69,14 @@ function TableSkeleton() {
 export default function CandidateTable({
   candidates,
   isLoading,
-  onSelectCandidate,
+  onRowClick,
+  selectedIds,
+  onSelect,
+  onSelectAll,
 }: CandidateTableProps) {
   const hasCandidates = candidates.length > 0;
+  const numSelected = selectedIds.length;
+  const rowCount = candidates.length;
 
   return (
     <Card>
@@ -83,6 +95,14 @@ export default function CandidateTable({
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-[50px] px-4">
+                   <Checkbox
+                    checked={rowCount > 0 && numSelected === rowCount}
+                    onCheckedChange={onSelectAll}
+                    disabled={isLoading || !hasCandidates}
+                    aria-label="Select all"
+                  />
+                </TableHead>
                 <TableHead className="w-[50px]">Rank</TableHead>
                 <TableHead>Candidate</TableHead>
                 <TableHead className="w-[100px]">Score</TableHead>
@@ -92,7 +112,19 @@ export default function CandidateTable({
             <TableBody>
               {isLoading && <TableSkeleton />}
               {!isLoading && hasCandidates && candidates.map((candidate) => (
-                <TableRow key={candidate.id} onClick={() => onSelectCandidate(candidate)} className="cursor-pointer">
+                <TableRow
+                  key={candidate.id}
+                  onClick={() => onRowClick(candidate)}
+                  className="cursor-pointer"
+                  data-state={selectedIds.includes(candidate.id) && "selected"}
+                >
+                  <TableCell className="px-4" onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedIds.includes(candidate.id)}
+                      onCheckedChange={() => onSelect(candidate.id)}
+                      aria-label={`Select ${candidate.name}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-bold text-lg text-muted-foreground">{candidate.rank}</TableCell>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-3">
@@ -115,7 +147,7 @@ export default function CandidateTable({
               ))}
               {!isLoading && !hasCandidates && (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
                     Results will appear here.
                   </TableCell>
                 </TableRow>

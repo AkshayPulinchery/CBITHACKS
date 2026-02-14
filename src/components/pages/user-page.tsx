@@ -13,6 +13,7 @@ import {
   Upload,
   BrainCircuit,
   Send,
+  Mail,
 } from 'lucide-react';
 import AuthButton from '@/components/auth-button';
 import { useAuth } from '@/contexts/auth-context';
@@ -106,6 +107,7 @@ export default function UserPage() {
   const notifications = [
       { id: 1, company: "Innovate Inc.", message: "has viewed your profile.", time: "2h ago", status: "viewed" },
       { id: 2, company: "Tech Solutions", message: "sent you an interview invitation for the Frontend Developer role.", time: "1d ago", status: "invited" },
+      { id: 4, company: "Data Dynamics", message: "has finalized your interview.", time: "2d ago", status: "invited" },
       { id: 3, company: "Creative Minds", message: "rejected your application.", time: "3d ago", status: "rejected" }
   ];
 
@@ -253,7 +255,7 @@ export default function UserPage() {
                                 <li key={notif.id}>
                                     <div className="flex items-start gap-4">
                                         <div className="bg-primary/10 text-primary p-2 rounded-full mt-1">
-                                            {notif.status === 'invited' && <User className="w-5 h-5"/>}
+                                            {notif.status === 'invited' && <Mail className="w-5 h-5"/>}
                                             {notif.status === 'viewed' && <UsersRound className="w-5 h-5"/>}
                                             {notif.status === 'rejected' && <UsersRound className="w-5 h-5"/>}
                                         </div>
