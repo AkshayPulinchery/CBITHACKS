@@ -8,7 +8,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyB_N0N8LeHigseIrz71TN4cKCilaMZf40M",
   authDomain: "skillrank-ai.firebaseapp.com",
   projectId: "skillrank-ai",
-  storageBucket: "skillrank-ai.appspot.com",
+  storageBucket: "skillrank-ai.firebasestorage.app",
   messagingSenderId: "482261842991",
   appId: "1:482261842991:web:2811b7cbfd0d74e686dada"
 };
