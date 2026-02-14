@@ -11,6 +11,8 @@ import {
   Award,
   Bell,
   Upload,
+  BrainCircuit,
+  Send,
 } from 'lucide-react';
 import AuthButton from '@/components/auth-button';
 import { useAuth } from '@/contexts/auth-context';
@@ -26,6 +28,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState } from 'react';
 
 function ProfileLinkInput({
   icon,
@@ -78,6 +81,26 @@ function DocumentUpload({
 
 export default function UserPage() {
   const { user } = useAuth();
+  
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState([
+    { from: 'ai', text: 'Hello! How can I help you improve your portfolio today?' }
+  ]);
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+    
+    const userMessage = { from: 'user', text: chatInput };
+    const newMessages = [...chatMessages, userMessage];
+    setChatMessages(newMessages);
+    setChatInput('');
+
+    // Mock AI response
+    setTimeout(() => {
+      const aiResponse = "That's a great question. To showcase your React skills, consider building a project with custom hooks, state management (like Redux or Zustand), and integration with a REST API. Make sure to deploy it and add it to your resume!";
+      setChatMessages(prev => [...prev, { from: 'ai', text: aiResponse }]);
+    }, 1000);
+  };
 
   // Mock data for notifications
   const notifications = [
@@ -172,6 +195,48 @@ export default function UserPage() {
                             description="Upload any relevant certificates."
                         />
                     </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                      <CardTitle className="font-headline flex items-center gap-2">
+                          <BrainCircuit />
+                          AI Career Coach
+                      </CardTitle>
+                      <CardDescription>Get personalized advice to boost your profile.</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                      <div>
+                          <h4 className="font-semibold mb-2">Resume & Score Analysis</h4>
+                          <p className="text-sm text-muted-foreground">
+                              Your resume is strong in React but could benefit from more project details demonstrating your Node.js experience. Consider adding a project that uses a full MERN stack to improve your backend score.
+                          </p>
+                      </div>
+                      <Separator />
+                      <div>
+                          <h4 className="font-semibold mb-2">Ask a Doubt</h4>
+                          <div className="space-y-4">
+                              <div className="p-4 bg-muted/50 rounded-lg h-48 overflow-y-auto text-sm space-y-3">
+                                {chatMessages.map((msg, index) => (
+                                  <div key={index} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                      <div className={`p-2 rounded-lg max-w-[80%] ${msg.from === 'user' ? 'bg-primary text-primary-foreground' : 'bg-background'}`}>
+                                          {msg.text}
+                                      </div>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="flex gap-2">
+                                  <Input 
+                                    placeholder="e.g., How can I showcase my React skills?" 
+                                    value={chatInput}
+                                    onChange={(e) => setChatInput(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                                  />
+                                  <Button onClick={handleSendMessage}><Send className="w-4 h-4" /></Button>
+                              </div>
+                          </div>
+                      </div>
+                  </CardContent>
                 </Card>
                 
                  <Card>
