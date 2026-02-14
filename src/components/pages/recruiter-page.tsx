@@ -15,7 +15,7 @@ import type { RankedCandidate } from '@/lib/types';
 import AuthButton from '@/components/auth-button';
 import { useAuth } from '@/contexts/auth-context';
 
-export default function RankerPage() {
+export default function RecruiterPage() {
   const [jobDescription, setJobDescription] = useState('');
   const [candidates, setCandidates] = useState<RankedCandidate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +31,8 @@ export default function RankerPage() {
       router.replace('/');
     } else if (!user.role) {
       router.replace('/role-selection');
+    } else if (user.role !== 'recruiter') {
+      router.replace('/user');
     }
   }, [user, authLoading, router]);
 
@@ -47,7 +49,7 @@ export default function RankerPage() {
     setIsLoading(false);
   };
 
-  if (authLoading || !user || !user.role) {
+  if (authLoading || !user || user.role !== 'recruiter') {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />

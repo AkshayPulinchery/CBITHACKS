@@ -42,7 +42,11 @@ export default function RoleSelectionPage() {
     }
     
     if (user?.role) {
-        router.replace('/ranker');
+        if (user.role === 'recruiter') {
+            router.replace('/recruiter');
+        } else if (user.role === 'job-seeker') {
+            router.replace('/user');
+        }
         return null;
     }
 
@@ -51,7 +55,11 @@ export default function RoleSelectionPage() {
         setSelectedRole(role);
         try {
             await setUserRole(role);
-            router.push('/ranker');
+            if (role === 'recruiter') {
+              router.push('/recruiter');
+            } else {
+              router.push('/user');
+            }
         } catch (error) {
             console.error("Failed to set user role:", error);
             setSelectedRole(null);

@@ -20,7 +20,13 @@ export default function HomePage() {
 
   const handleGetStartedClick = () => {
     if (user) {
-      router.push('/ranker');
+      if (user.role === 'recruiter') {
+        router.push('/recruiter');
+      } else if (user.role === 'job-seeker') {
+        router.push('/user');
+      } else {
+        router.push('/role-selection');
+      }
     } else {
       signInWithGoogle();
     }
@@ -50,7 +56,7 @@ export default function HomePage() {
             SkillRank AI uses advanced artificial intelligence to analyze your job descriptions and automatically rank candidates based on their true qualifications. Say goodbye to manual screening.
           </p>
           <Button size="lg" onClick={handleGetStartedClick} disabled={loading}>
-             {user ? "Go to Ranker" : "Get Started Now"}
+             {user ? "Go to Dashboard" : "Get Started Now"}
           </Button>
         </section>
 
