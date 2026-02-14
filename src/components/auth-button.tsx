@@ -13,9 +13,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogIn, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { AuthDialog } from './auth-dialog';
 
 export default function AuthButton() {
-  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
 
   if (loading) {
     return (
@@ -28,10 +31,13 @@ export default function AuthButton() {
 
   if (!user) {
     return (
-      <Button onClick={signInWithGoogle}>
-        <LogIn className="mr-2 h-4 w-4" />
-        Login
-      </Button>
+      <>
+        <Button onClick={() => setAuthDialogOpen(true)}>
+          <LogIn className="mr-2 h-4 w-4" />
+          Login
+        </Button>
+        <AuthDialog open={isAuthDialogOpen} onOpenChange={setAuthDialogOpen} />
+      </>
     );
   }
 

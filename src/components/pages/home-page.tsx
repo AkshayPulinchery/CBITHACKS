@@ -9,11 +9,13 @@ import { useRouter } from 'next/navigation';
 import AuthButton from '@/components/auth-button';
 import { useAuth } from '@/contexts/auth-context';
 import Link from 'next/link';
+import { AuthDialog } from '@/components/auth-dialog';
 
 export default function HomePage() {
   const [year, setYear] = useState(new Date().getFullYear());
-  const { user, signInWithGoogle, loading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
+  const [isAuthDialogOpen, setAuthDialogOpen] = useState(false);
 
   useEffect(() => {
     setYear(new Date().getFullYear());
@@ -29,11 +31,12 @@ export default function HomePage() {
         router.push('/role-selection');
       }
     } else {
-      signInWithGoogle();
+      setAuthDialogOpen(true);
     }
   };
 
   return (
+    <>
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="py-4 px-4 md:px-8 border-b sticky top-0 bg-background/95 backdrop-blur-sm z-10">
         <div className="container mx-auto flex items-center justify-between">
@@ -166,5 +169,7 @@ export default function HomePage() {
             </div>
         </footer>
     </div>
+    <AuthDialog open={isAuthDialogOpen} onOpenChange={setAuthDialogOpen} />
+    </>
   );
 }

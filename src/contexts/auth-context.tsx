@@ -1,4 +1,3 @@
-
 'use client';
 
 import {createContext, useContext, useEffect, useState} from 'react';
@@ -6,11 +5,17 @@ import type {User as FirebaseUser} from 'firebase/auth';
 import {auth, db} from '@/lib/firebase/config';
 import {doc, getDoc, setDoc} from 'firebase/firestore';
 import type {AppUser} from '@/lib/types';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from 'firebase/auth';
 
 interface AuthContextType {
   user: AppUser | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signIn: (email: string, pass: string) => Promise<any>;
+  signUp: (email: string, pass: string, displayName: string) => Promise<any>;
   signOut: () => Promise<void>;
   setUserRole: (role: 'recruiter' | 'job-seeker') => Promise<void>;
 }
@@ -47,14 +52,27 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     return () => unsubscribe();
   }, []);
   
-  const signInWithGoogle = async () => {
-    const {GoogleAuthProvider, signInWithPopup} = await import('firebase/auth');
-    const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error('Error signing in with Google', error);
-    }
+  const signIn = async (email: string, pass: string) => {
+    return signInWithEmailAndPassword(auth, email, pass);
+  };
+
+  const signUp = async (email: string, pass: string, displayName: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(userCredential.user, { displayName });
+    
+    // Create user document in Firestore
+    const userDocRef = doc(db, 'users', userCredential.user.uid);
+    const userData = {
+        email: userCredential.user.email,
+        displayName: userCredential.user.displayName,
+        photoURL: userCredential.user.photoURL,
+        role: null
+    };
+    await setDoc(userDocRef, userData);
+
+    // The onAuthStateChanged listener will automatically pick up the new user
+    // and fetch the document we just created.
+    return userCredential;
   };
 
   const signOut = async () => {
@@ -78,7 +96,7 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     setUser({...user, role});
   };
 
-  const value = {user, loading, signInWithGoogle, signOut, setUserRole};
+  const value = {user, loading, signIn, signUp, signOut, setUserRole};
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
