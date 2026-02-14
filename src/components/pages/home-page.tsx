@@ -4,6 +4,7 @@ import { UsersRound, FileText, BarChart, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function HomePage() {
   const [year, setYear] = useState(new Date().getFullYear());
@@ -22,25 +23,29 @@ export default function HomePage() {
               SkillRank AI
             </h1>
           </div>
-          <Button>Get Started</Button>
+          <Button asChild>
+            <Link href="/ranker">Get Started</Link>
+          </Button>
         </div>
       </header>
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="container mx-auto text-center py-20 md:py-32">
+        <section className="container mx-auto text-center py-20 md:py-32 px-4">
           <h2 className="text-4xl md:text-6xl font-headline font-bold mb-4 leading-tight">
             Find the Perfect Candidate, Faster.
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             SkillRank AI uses advanced artificial intelligence to analyze your job descriptions and automatically rank candidates based on their true qualifications. Say goodbye to manual screening.
           </p>
-          <Button size="lg">Rank Your Candidates Now</Button>
+          <Button size="lg" asChild>
+             <Link href="/ranker">Rank Your Candidates Now</Link>
+          </Button>
         </section>
 
         {/* How It Works Section */}
         <section className="bg-muted/50 py-20 md:py-24">
-          <div className="container mx-auto">
+          <div className="container mx-auto px-4">
             <div className="text-center max-w-2xl mx-auto">
               <h3 className="text-3xl md:text-4xl font-headline font-bold mb-4">How It Works</h3>
               <p className="text-muted-foreground mb-12">
@@ -92,7 +97,7 @@ export default function HomePage() {
         </section>
 
         {/* Features Section */}
-        <section className="container mx-auto py-20 md:py-24">
+        <section className="container mx-auto py-20 md:py-24 px-4">
             <div className="text-center max-w-2xl mx-auto">
               <h3 className="text-3xl md:text-4xl font-headline font-bold mb-4">Features for Modern Recruiting</h3>
                <p className="text-muted-foreground mb-12">
@@ -130,7 +135,7 @@ export default function HomePage() {
 
         {/* Footer */}
         <footer className="border-t py-6 bg-muted/50">
-            <div className="container mx-auto text-center text-muted-foreground">
+            <div className="container mx-auto text-center text-muted-foreground px-4">
                 <p>&copy; {year} SkillRank AI. All rights reserved.</p>
             </div>
         </footer>
