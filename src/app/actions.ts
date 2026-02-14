@@ -4,12 +4,11 @@ import { extractJobDescriptionSkills } from '@/ai/flows/extract-job-description-
 import { generateCandidateExplanation } from '@/ai/flows/generate-candidate-explanation';
 import {
   generateChatResponse,
-  type ChatMessage,
 } from '@/ai/flows/generate-chat-response';
 import { generateProfileAnalysis } from '@/ai/flows/generate-profile-analysis';
 import { generateMockNotifications } from '@/ai/flows/generate-mock-notifications';
 import studentsData from '@/data/students.json';
-import type { RankedCandidate, Student, Notification } from '@/lib/types';
+import type { RankedCandidate, Student, Notification, ChatMessage } from '@/lib/types';
 
 const WEIGHTS = {
   leetCode: 0.3,

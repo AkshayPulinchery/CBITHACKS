@@ -58,3 +58,8 @@ export interface Notification {
   time: string;
   status: "viewed" | "invited" | "rejected";
 }
+
+export interface ChatMessage {
+  role: 'user' | 'model';
+  content: { text: string }[];
+}

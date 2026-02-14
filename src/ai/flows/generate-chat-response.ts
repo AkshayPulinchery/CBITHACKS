@@ -11,11 +11,10 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-export const ChatMessageSchema = z.object({
+const ChatMessageSchema = z.object({
   role: z.enum(['user', 'model']),
   content: z.array(z.object({text: z.string()})),
 });
-export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 
 const ChatResponseInputSchema = z.object({
   context: z
