@@ -2,11 +2,28 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { UsersRound, AlertCircle, Send, Sparkles } from 'lucide-react';
+import {
+  UsersRound,
+  AlertCircle,
+  Send,
+  Sparkles,
+  FileUp,
+  Upload,
+  BrainCircuit,
+} from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import JobDescriptionForm from '@/components/job-description-form';
 import CandidateTable from '@/components/candidate-table';
@@ -52,7 +69,44 @@ export default function RecruiterPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<RankedCandidate | null>(null);
   const [selectedCandidateIds, setSelectedCandidateIds] = useState<number[]>([]);
+  const [candidateFile, setCandidateFile] = useState<File | null>(null);
   const { toast } = useToast();
+
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState([
+    { from: 'ai', text: 'Hello! Ask me anything about improving your job description or evaluating candidates.' }
+  ]);
+
+  const handleSendMessage = () => {
+    if (!chatInput.trim()) return;
+
+    const userMessage = { from: 'user', text: chatInput };
+    setChatMessages(prev => [...prev, userMessage]);
+    setChatInput('');
+
+    setTimeout(() => {
+      const aiResponse = "That's a great question. To attract more senior developers, you could add details about your tech stack's architecture, challenges the team is facing, and opportunities for mentorship within the team.";
+      setChatMessages(prev => [...prev, { from: 'ai', text: aiResponse }]);
+    }, 1000);
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files?.[0]) {
+      setCandidateFile(event.target.files[0]);
+      toast({
+        title: "File Ready",
+        description: `"${event.target.files[0].name}" is selected.`,
+      });
+    }
+  };
+
+  const handleUploadAndRank = () => {
+    if (!candidateFile) return;
+    toast({
+      title: "Feature in development",
+      description: "Ranking candidates from a CSV file is coming soon!",
+    });
+  };
 
   const handleJobDetailsChange = (fieldName: string, value: string) => {
     setJobDetails(prev => ({ ...prev, [fieldName]: value }));
@@ -90,10 +144,8 @@ export default function RecruiterPage() {
 
     const jobDescription = `
       Job Title: ${jobDetails.title}
-
       Key Responsibilities:
       ${jobDetails.responsibilities}
-
       Required Skills & Qualifications:
       ${jobDetails.qualifications}
     `;
@@ -123,15 +175,38 @@ export default function RecruiterPage() {
 
       <main className="flex-grow container mx-auto p-4 md:p-8">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             <JobDescriptionForm
               jobDetails={jobDetails}
               onJobDetailsChange={handleJobDetailsChange}
               onSubmit={handleSubmit}
               isLoading={isLoading}
             />
+             <Card>
+              <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                  <FileUp className="w-6 h-6" />
+                  Upload Candidates
+                </CardTitle>
+                <CardDescription>
+                  Alternatively, upload a CSV with candidate data. The AI will rank them instead of the default profiles.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid w-full items-center gap-1.5">
+                    <Label htmlFor="csv-upload">Candidate CSV File</Label>
+                    <Input id="csv-upload" type="file" accept=".csv" onChange={handleFileChange} disabled={isLoading}/>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button onClick={handleUploadAndRank} disabled={!candidateFile || isLoading} className="w-full" variant="outline">
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload & Rank
+                </Button>
+              </CardFooter>
+            </Card>
           </div>
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 space-y-4">
             {error && (
                <Alert variant="destructive" className="mb-4">
                   <AlertCircle className="h-4 w-4" />
@@ -145,7 +220,7 @@ export default function RecruiterPage() {
             )}
 
             {candidates.length > 0 && !isLoading && (
-              <div className="flex justify-end mb-4">
+              <div className="flex justify-end">
                 <Button onClick={handleSendInvitation} disabled={selectedCandidateIds.length === 0}>
                   <Send className="mr-2 h-4 w-4" />
                   Send Interview Invitation ({selectedCandidateIds.length})
@@ -161,6 +236,37 @@ export default function RecruiterPage() {
               onSelect={handleCandidateSelect}
               onSelectAll={handleSelectAll}
             />
+             <Card>
+              <CardHeader>
+                  <CardTitle className="font-headline flex items-center gap-2">
+                      <BrainCircuit />
+                      AI Recruiter Assistant
+                  </CardTitle>
+                  <CardDescription>Get personalized advice to refine your search.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                  <div className="space-y-4">
+                      <div className="p-4 bg-muted/50 rounded-lg h-48 overflow-y-auto text-sm space-y-3">
+                        {chatMessages.map((msg, index) => (
+                          <div key={index} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+                              <div className={`p-2 rounded-lg max-w-[80%] ${msg.from === 'user' ? 'bg-primary text-primary-foreground' : 'bg-background'}`}>
+                                  {msg.text}
+                              </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex gap-2">
+                          <Input
+                            placeholder="e.g., How to improve my job description?"
+                            value={chatInput}
+                            onChange={(e) => setChatInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                          />
+                          <Button onClick={handleSendMessage}><Send className="w-4 h-4" /></Button>
+                      </div>
+                  </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </main>
