@@ -1,12 +1,5 @@
 'use server';
 
-import { extractJobDescriptionSkills } from '@/ai/flows/extract-job-description-skills';
-import { generateCandidateExplanation } from '@/ai/flows/generate-candidate-explanation';
-import {
-  generateChatResponse,
-} from '@/ai/flows/generate-chat-response';
-import { generateProfileAnalysis } from '@/ai/flows/generate-profile-analysis';
-import { generateMockNotifications } from '@/ai/flows/generate-mock-notifications';
 import studentsData from '@/data/students.json';
 import type { RankedCandidate, Student, Notification, ChatMessage } from '@/lib/types';
 
@@ -23,92 +16,73 @@ export async function getRankedCandidates(
     return [];
   }
 
-  try {
-    const jobSkills = await extractJobDescriptionSkills({ jobDescription });
-    const allJobSkills = [
-      ...jobSkills.requiredSkills,
-      ...jobSkills.experienceKeywords,
-      ...jobSkills.technologies,
-    ].map(skill => skill.toLowerCase());
+  // FAKE skill extraction: just split the job description into words.
+  const allJobSkills = jobDescription.toLowerCase().split(/[\s,.;:()]+/).filter(word => word.length > 3);
 
-    if (allJobSkills.length === 0) {
-      return [];
-    }
-    
-    const students: Student[] = studentsData;
-
-    const maxLeetCodeSolved = Math.max(...students.map(s => s.leetcodeSolved), 1);
-
-    const candidatesWithScores = students.map(student => {
-      const leetCodeScore = (student.leetcodeSolved / maxLeetCodeSolved) * 100;
-
-      const relevantRepos = student.githubRepos.filter(repo =>
-        repo.tech.some(t => allJobSkills.includes(t.toLowerCase()))
-      );
-      const githubScore = student.githubRepos.length > 0
-        ? (relevantRepos.length / student.githubRepos.length) * 100
-        : 0;
-
-      const matchedSkills = student.linkedinSkills.filter(skill =>
-        allJobSkills.includes(skill.toLowerCase())
-      );
-      const linkedinScore = allJobSkills.length > 0 ? (matchedSkills.length / allJobSkills.length) * 100 : 0;
-      
-      const totalScore = 
-        leetCodeScore * WEIGHTS.leetCode +
-        githubScore * WEIGHTS.github +
-        linkedinScore * WEIGHTS.linkedin;
-
-      return {
-        ...student,
-        totalScore,
-        details: {
-          leetcode: { score: leetCodeScore, solved: student.leetcodeSolved },
-          github: { score: githubScore, relevantRepos },
-          linkedin: { score: linkedinScore, matchedSkills },
-        },
-      };
-    });
-
-    const sortedCandidates = candidatesWithScores.sort((a, b) => b.totalScore - a.totalScore);
-
-    const rankedCandidates: RankedCandidate[] = [];
-    for (const [index, candidate] of sortedCandidates.entries()) {
-      const aiExplanation = await generateCandidateExplanation({
-        candidateName: candidate.name,
-        candidateScore: Math.round(candidate.totalScore),
-        jobDescription,
-        requiredSkills: allJobSkills,
-        candidateLeetCodeSolved: candidate.leetcodeSolved,
-        candidateGithubRepos: candidate.githubRepos,
-        candidateLinkedInSkills: candidate.linkedinSkills,
-      });
-
-      rankedCandidates.push({
-        id: candidate.id,
-        rank: index + 1,
-        name: candidate.name,
-        avatarUrl: candidate.avatarUrl,
-        dataAiHint: candidate.dataAiHint,
-        totalScore: Math.round(candidate.totalScore),
-        keyStrength: aiExplanation.keyStrengthsSummary,
-        explanation: aiExplanation.explanation,
-        details: {
-          leetcode: { ...candidate.details.leetcode, score: Math.round(candidate.details.leetcode.score) },
-          github: { ...candidate.details.github, score: Math.round(candidate.details.github.score) },
-          linkedin: { ...candidate.details.linkedin, score: Math.round(candidate.details.linkedin.score) },
-        },
-      });
-    }
-
-    return rankedCandidates;
-  } catch (error) {
-    console.error("Error in getRankedCandidates:", error);
-    if (error instanceof Error && error.message.includes('RESOURCE_EXHAUSTED')) {
-      return { error: "The request failed due to API rate limits. This usually means the Vertex AI API is not enabled or billing is not set up for your Google Cloud project. Please visit the Google Cloud console for project 'skillrank-ai', enable the Vertex AI API, and ensure a billing account is linked." };
-    }
-    return { error: "An unexpected error occurred while ranking candidates. Please try again." };
+  if (allJobSkills.length === 0) {
+    return [];
   }
+  
+  const students: Student[] = studentsData;
+
+  const maxLeetCodeSolved = Math.max(...students.map(s => s.leetcodeSolved), 1);
+
+  const candidatesWithScores = students.map(student => {
+    const leetCodeScore = (student.leetcodeSolved / maxLeetCodeSolved) * 100;
+
+    const relevantRepos = student.githubRepos.filter(repo =>
+      repo.tech.some(t => allJobSkills.includes(t.toLowerCase()))
+    );
+    const githubScore = student.githubRepos.length > 0
+      ? (relevantRepos.length / student.githubRepos.length) * 100
+      : 0;
+
+    const matchedSkills = student.linkedinSkills.filter(skill =>
+      allJobSkills.includes(skill.toLowerCase())
+    );
+    const linkedinScore = allJobSkills.length > 0 ? (matchedSkills.length / allJobSkills.length) * 100 : 0;
+    
+    const totalScore = 
+      leetCodeScore * WEIGHTS.leetCode +
+      githubScore * WEIGHTS.github +
+      linkedinScore * WEIGHTS.linkedin;
+
+    return {
+      ...student,
+      totalScore,
+      details: {
+        leetcode: { score: leetCodeScore, solved: student.leetcodeSolved },
+        github: { score: githubScore, relevantRepos },
+        linkedin: { score: linkedinScore, matchedSkills },
+      },
+    };
+  });
+
+  const sortedCandidates = candidatesWithScores.sort((a, b) => b.totalScore - a.totalScore);
+
+  const rankedCandidates: RankedCandidate[] = sortedCandidates.map((candidate, index) => {
+    // FAKE explanation
+    const keyStrength = "Matches key skills from job description.";
+    const explanation = `Based on a direct keyword analysis of the job description, ${candidate.name}'s profile shows a strong correlation with the required skills. Their experience in relevant technologies and a solid problem-solving background contribute to their high score. (Note: This is a simplified analysis as AI features are currently disabled.)`;
+
+    return {
+      id: candidate.id,
+      rank: index + 1,
+      name: candidate.name,
+      avatarUrl: candidate.avatarUrl,
+      dataAiHint: candidate.dataAiHint,
+      totalScore: Math.round(candidate.totalScore),
+      keyStrength: keyStrength,
+      explanation: explanation,
+      details: {
+        leetcode: { ...candidate.details.leetcode, score: Math.round(candidate.details.leetcode.score) },
+        github: { ...candidate.details.github, score: Math.round(candidate.details.github.score) },
+        linkedin: { ...candidate.details.linkedin, score: Math.round(candidate.details.linkedin.score) },
+      },
+    };
+  });
+
+  return rankedCandidates;
 }
 
 export async function getAiChatResponse(
@@ -116,50 +90,52 @@ export async function getAiChatResponse(
   history: ChatMessage[],
   question: string
 ): Promise<string> {
-  try {
-    const response = await generateChatResponse({
-      context,
-      history: history,
-      question,
-    });
-    return response;
-  } catch (error) {
-    console.error('Error in getAiChatResponse:', error);
-    return 'Sorry, I encountered an error. Please try again.';
-  }
+  const responses = {
+    'recruiter-assistant': "Thank you for your question. AI-powered chat is currently in a simplified mode. For now, focus on providing a detailed job description to get the best results.",
+    'career-coach': "Thanks for asking! AI-powered career coaching is in a simplified mode. I recommend ensuring your GitHub and LinkedIn profiles are connected and up-to-date for an accurate score."
+  };
+  // Add a small delay to simulate a network request
+  await new Promise(resolve => setTimeout(resolve, 500));
+  return responses[context];
 }
 
 export async function getProfileAnalysis(
   userName: string,
   profileSummary: string
 ): Promise<string> {
-  try {
-    const analysis = await generateProfileAnalysis({ userName, profileSummary });
-    return analysis;
-  } catch (error) {
-    console.error('Error in getProfileAnalysis:', error);
-    return 'Could not generate profile analysis at this time.';
-  }
+  // Add a small delay to simulate a network request
+  await new Promise(resolve => setTimeout(resolve, 300));
+  return `Your profile summary shows: "${profileSummary}". To improve, consider adding more projects to your GitHub that showcase a variety of technologies. A detailed README for each project is also highly recommended. (Note: This is a generic analysis as AI features are currently disabled.)`;
 }
 
 export async function getMockNotifications(
   userName: string
 ): Promise<Notification[]> {
-  try {
-    const result = await generateMockNotifications({ userName });
-    return result.notifications;
-  } catch (error) {
-    console.error('Error in getMockNotifications:', error);
-    return [
-      {
-        id: 1,
-        company: 'Error',
-        message: 'Could not fetch notifications.',
-        time: 'Just now',
-        status: 'rejected',
-      },
-    ];
-  }
+  // Add a small delay to simulate a network request
+  await new Promise(resolve => setTimeout(resolve, 400));
+  return [
+    {
+      "id": 1,
+      "company": "Innovate Inc.",
+      "message": "has viewed your profile.",
+      "time": "2h ago",
+      "status": "viewed"
+    },
+    {
+      "id": 2,
+      "company": "Tech Solutions",
+      "message": "sent you an interview invitation.",
+      "time": "1d ago",
+      "status": "invited"
+    },
+    {
+      "id": 3,
+      "company": "DataCorp",
+      "message": "is no longer considering your application.",
+      "time": "3d ago",
+      "status": "rejected"
+    }
+  ];
 }
 
 export async function getUserProfileData(
