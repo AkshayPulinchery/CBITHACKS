@@ -62,14 +62,6 @@ export default function HomePage() {
           <Button size="lg" onClick={handleGetStartedClick} disabled={loading}>
              {user ? "Go to Dashboard" : "Get Started Now"}
           </Button>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link href="/recruiter">
-              <Button variant="outline">Test Recruiter Page</Button>
-            </Link>
-            <Link href="/user">
-              <Button variant="outline">Test User Page</Button>
-            </Link>
-          </div>
         </section>
 
         {/* How It Works Section */}
