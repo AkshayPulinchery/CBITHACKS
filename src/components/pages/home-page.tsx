@@ -1,17 +1,30 @@
+
 'use client';
 
 import { UsersRound, FileText, BarChart, BrainCircuit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import AuthButton from '@/components/auth-button';
+import { useAuth } from '@/contexts/auth-context';
 
 export default function HomePage() {
   const [year, setYear] = useState(new Date().getFullYear());
+  const { user, signInWithGoogle, loading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     setYear(new Date().getFullYear());
   }, []);
+
+  const handleGetStartedClick = () => {
+    if (user) {
+      router.push('/ranker');
+    } else {
+      signInWithGoogle();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -23,9 +36,7 @@ export default function HomePage() {
               SkillRank AI
             </h1>
           </div>
-          <Button asChild>
-            <Link href="/ranker">Get Started</Link>
-          </Button>
+          <AuthButton />
         </div>
       </header>
 
@@ -38,8 +49,8 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             SkillRank AI uses advanced artificial intelligence to analyze your job descriptions and automatically rank candidates based on their true qualifications. Say goodbye to manual screening.
           </p>
-          <Button size="lg" asChild>
-             <Link href="/ranker">Rank Your Candidates Now</Link>
+          <Button size="lg" onClick={handleGetStartedClick} disabled={loading}>
+             {user ? "Go to Ranker" : "Get Started Now"}
           </Button>
         </section>
 

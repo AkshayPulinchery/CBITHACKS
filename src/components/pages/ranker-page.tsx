@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -10,6 +11,7 @@ import CandidateTable from '@/components/candidate-table';
 import CandidateDetailsDialog from '@/components/candidate-details-dialog';
 import { getRankedCandidates } from '@/app/actions';
 import type { RankedCandidate } from '@/lib/types';
+import AuthButton from '@/components/auth-button';
 
 export default function RankerPage() {
   const [jobDescription, setJobDescription] = useState('');
@@ -41,9 +43,7 @@ export default function RankerPage() {
               SkillRank AI
             </h1>
           </Link>
-          <Button variant="ghost" asChild>
-            <Link href="/">Home</Link>
-          </Button>
+          <AuthButton />
         </div>
       </header>
 

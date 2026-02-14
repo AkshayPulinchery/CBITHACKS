@@ -1,3 +1,12 @@
+
+export interface AppUser {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  role: 'recruiter' | 'job-seeker' | null;
+}
+
 export interface Student {
   id: number;
   name: string;
