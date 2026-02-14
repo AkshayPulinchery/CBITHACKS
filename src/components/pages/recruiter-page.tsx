@@ -10,6 +10,7 @@ import {
   FileUp,
   Upload,
   BrainCircuit,
+  Loader2,
 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -28,7 +29,7 @@ import { useToast } from '@/hooks/use-toast';
 import JobDescriptionForm from '@/components/job-description-form';
 import CandidateTable from '@/components/candidate-table';
 import CandidateDetailsDialog from '@/components/candidate-details-dialog';
-import { getRankedCandidates } from '@/app/actions';
+import { getRankedCandidates, getAiChatResponse } from '@/app/actions';
 import type { RankedCandidate } from '@/lib/types';
 import AuthButton from '@/components/auth-button';
 
@@ -74,20 +75,29 @@ export default function RecruiterPage() {
 
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([
-    { from: 'ai', text: 'Hello! Ask me anything about improving your job description or evaluating candidates.' }
+    { from: 'ai' as const, text: 'Hello! Ask me anything about improving your job description or evaluating candidates.' }
   ]);
+  const [chatLoading, setChatLoading] = useState(false);
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || chatLoading) return;
 
-    const userMessage = { from: 'user', text: chatInput };
-    setChatMessages(prev => [...prev, userMessage]);
+    const userMessage = { from: 'user' as const, text: chatInput };
+    const newMessages = [...chatMessages, userMessage];
+    
+    setChatMessages(newMessages);
+    const question = chatInput;
     setChatInput('');
+    setChatLoading(true);
 
-    setTimeout(() => {
-      const aiResponse = "That's a great question. To attract more senior developers, you could add details about your tech stack's architecture, challenges the team is facing, and opportunities for mentorship within the team.";
-      setChatMessages(prev => [...prev, { from: 'ai', text: aiResponse }]);
-    }, 1000);
+    try {
+        const aiResponse = await getAiChatResponse('recruiter-assistant', chatMessages, question);
+        setChatMessages(prev => [...prev, { from: 'ai' as const, text: aiResponse }]);
+    } catch (error) {
+        setChatMessages(prev => [...prev, { from: 'ai' as const, text: 'Sorry, I had trouble responding. Please try again.' }]);
+    } finally {
+        setChatLoading(false);
+    }
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -254,6 +264,13 @@ export default function RecruiterPage() {
                               </div>
                           </div>
                         ))}
+                         {chatLoading && (
+                          <div className="flex justify-start">
+                            <div className="p-2 rounded-lg bg-background">
+                              <Loader2 className="w-4 h-4 animate-spin"/>
+                            </div>
+                          </div>
+                        )}
                       </div>
                       <div className="flex gap-2">
                           <Input
@@ -261,8 +278,11 @@ export default function RecruiterPage() {
                             value={chatInput}
                             onChange={(e) => setChatInput(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                            disabled={chatLoading}
                           />
-                          <Button onClick={handleSendMessage}><Send className="w-4 h-4" /></Button>
+                          <Button onClick={handleSendMessage} disabled={chatLoading}>
+                            {chatLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                          </Button>
                       </div>
                   </div>
               </CardContent>

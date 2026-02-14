@@ -2,8 +2,14 @@
 
 import { extractJobDescriptionSkills } from '@/ai/flows/extract-job-description-skills';
 import { generateCandidateExplanation } from '@/ai/flows/generate-candidate-explanation';
+import {
+  generateChatResponse,
+  type ChatMessage,
+} from '@/ai/flows/generate-chat-response';
+import { generateProfileAnalysis } from '@/ai/flows/generate-profile-analysis';
+import { generateMockNotifications } from '@/ai/flows/generate-mock-notifications';
 import studentsData from '@/data/students.json';
-import type { RankedCandidate, Student } from '@/lib/types';
+import type { RankedCandidate, Student, Notification } from '@/lib/types';
 
 const WEIGHTS = {
   leetCode: 0.3,
@@ -103,5 +109,62 @@ export async function getRankedCandidates(
       return { error: "The request could not be processed due to API rate limits. Please try again in a few moments." };
     }
     return { error: "An unexpected error occurred while ranking candidates. Please try again." };
+  }
+}
+
+export async function getAiChatResponse(
+  context: 'recruiter-assistant' | 'career-coach',
+  history: { from: 'user' | 'ai'; text: string }[],
+  question: string
+): Promise<string> {
+  try {
+    // Convert frontend message format to Genkit's expected format
+    const genkitHistory: ChatMessage[] = history.map(msg => ({
+      role: msg.from === 'user' ? 'user' : 'model',
+      content: [{ text: msg.text }],
+    }));
+
+    const response = await generateChatResponse({
+      context,
+      history: genkitHistory,
+      question,
+    });
+    return response;
+  } catch (error) {
+    console.error('Error in getAiChatResponse:', error);
+    return 'Sorry, I encountered an error. Please try again.';
+  }
+}
+
+export async function getProfileAnalysis(
+  userName: string,
+  profileSummary: string
+): Promise<string> {
+  try {
+    const analysis = await generateProfileAnalysis({ userName, profileSummary });
+    return analysis;
+  } catch (error) {
+    console.error('Error in getProfileAnalysis:', error);
+    return 'Could not generate profile analysis at this time.';
+  }
+}
+
+export async function getMockNotifications(
+  userName: string
+): Promise<Notification[]> {
+  try {
+    const result = await generateMockNotifications({ userName });
+    return result.notifications;
+  } catch (error) {
+    console.error('Error in getMockNotifications:', error);
+    return [
+      {
+        id: 1,
+        company: 'Error',
+        message: 'Could not fetch notifications.',
+        time: 'Just now',
+        status: 'rejected',
+      },
+    ];
   }
 }

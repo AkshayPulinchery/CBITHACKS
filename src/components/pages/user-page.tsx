@@ -14,6 +14,7 @@ import {
   BrainCircuit,
   Send,
   Mail,
+  Loader2,
 } from 'lucide-react';
 import AuthButton from '@/components/auth-button';
 import { useAuth } from '@/contexts/auth-context';
@@ -29,7 +30,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { getAiChatResponse, getProfileAnalysis, getMockNotifications } from '@/app/actions';
+import type { Notification } from '@/lib/types';
 
 function ProfileLinkInput({
   icon,
@@ -83,33 +87,51 @@ function DocumentUpload({
 export default function UserPage() {
   const { user } = useAuth();
   
+  const [analysis, setAnalysis] = useState('');
+  const [analysisLoading, setAnalysisLoading] = useState(true);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
+
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([
-    { from: 'ai', text: 'Hello! How can I help you improve your portfolio today?' }
+    { from: 'ai' as const, text: 'Hello! How can I help you improve your portfolio today?' }
   ]);
+  const [chatLoading, setChatLoading] = useState(false);
 
-  const handleSendMessage = () => {
-    if (!chatInput.trim()) return;
+  useEffect(() => {
+    if (user?.displayName) {
+        setAnalysisLoading(true);
+        setNotificationsLoading(true);
+
+        getProfileAnalysis(user.displayName, 'Excellent Match for Frontend Roles')
+            .then(setAnalysis)
+            .finally(() => setAnalysisLoading(false));
+
+        getMockNotifications(user.displayName)
+            .then(setNotifications)
+            .finally(() => setNotificationsLoading(false));
+    }
+  }, [user]);
+
+  const handleSendMessage = async () => {
+    if (!chatInput.trim() || chatLoading) return;
     
-    const userMessage = { from: 'user', text: chatInput };
+    const userMessage = { from: 'user' as const, text: chatInput };
     const newMessages = [...chatMessages, userMessage];
     setChatMessages(newMessages);
+    const question = chatInput;
     setChatInput('');
+    setChatLoading(true);
 
-    // Mock AI response
-    setTimeout(() => {
-      const aiResponse = "That's a great question. To showcase your React skills, consider building a project with custom hooks, state management (like Redux or Zustand), and integration with a REST API. Make sure to deploy it and add it to your resume!";
-      setChatMessages(prev => [...prev, { from: 'ai', text: aiResponse }]);
-    }, 1000);
+    try {
+      const aiResponse = await getAiChatResponse('career-coach', chatMessages, question);
+      setChatMessages(prev => [...prev, { from: 'ai' as const, text: aiResponse }]);
+    } catch (error) {
+      setChatMessages(prev => [...prev, { from: 'ai' as const, text: 'Sorry, I had trouble responding. Please try again.' }]);
+    } finally {
+      setChatLoading(false);
+    }
   };
-
-  // Mock data for notifications
-  const notifications = [
-      { id: 1, company: "Innovate Inc.", message: "has viewed your profile.", time: "2h ago", status: "viewed" },
-      { id: 2, company: "Tech Solutions", message: "sent you an interview invitation for the Frontend Developer role.", time: "1d ago", status: "invited" },
-      { id: 4, company: "Data Dynamics", message: "has finalized your interview.", time: "2d ago", status: "invited" },
-      { id: 3, company: "Creative Minds", message: "rejected your application.", time: "3d ago", status: "rejected" }
-  ];
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
@@ -210,9 +232,14 @@ export default function UserPage() {
                   <CardContent className="space-y-6">
                       <div>
                           <h4 className="font-semibold mb-2">Resume & Score Analysis</h4>
-                          <p className="text-sm text-muted-foreground">
-                              Your resume is strong in React but could benefit from more project details demonstrating your Node.js experience. Consider adding a project that uses a full MERN stack to improve your backend score.
-                          </p>
+                          {analysisLoading ? (
+                            <div className="space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-4 w-5/6" />
+                            </div>
+                          ) : (
+                            <p className="text-sm text-muted-foreground">{analysis}</p>
+                          )}
                       </div>
                       <Separator />
                       <div>
@@ -226,6 +253,13 @@ export default function UserPage() {
                                       </div>
                                   </div>
                                 ))}
+                                {chatLoading && (
+                                  <div className="flex justify-start">
+                                    <div className="p-2 rounded-lg bg-background">
+                                      <Loader2 className="w-4 h-4 animate-spin"/>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                               <div className="flex gap-2">
                                   <Input 
@@ -233,8 +267,11 @@ export default function UserPage() {
                                     value={chatInput}
                                     onChange={(e) => setChatInput(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                                    disabled={chatLoading}
                                   />
-                                  <Button onClick={handleSendMessage}><Send className="w-4 h-4" /></Button>
+                                  <Button onClick={handleSendMessage} disabled={chatLoading}>
+                                    {chatLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                                  </Button>
                               </div>
                           </div>
                       </div>
@@ -250,6 +287,19 @@ export default function UserPage() {
                         <CardDescription>Updates from recruiters will appear here.</CardDescription>
                     </CardHeader>
                     <CardContent>
+                      {notificationsLoading ? (
+                        <div className="space-y-4">
+                          {[...Array(3)].map((_, i) => (
+                            <div key={i} className="flex items-start gap-4">
+                              <Skeleton className="w-9 h-9 rounded-full mt-1" />
+                              <div className="flex-grow space-y-2">
+                                <Skeleton className="h-4 w-full" />
+                                <Skeleton className="h-3 w-1/4" />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
                         <ul className="space-y-4">
                             {notifications.map((notif, index) => (
                                 <li key={notif.id}>
@@ -268,6 +318,7 @@ export default function UserPage() {
                                 </li>
                             ))}
                         </ul>
+                      )}
                     </CardContent>
                 </Card>
             </div>

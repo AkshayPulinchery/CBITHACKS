@@ -50,3 +50,11 @@ export interface JobSkills {
   experienceKeywords: string[];
   technologies: string[];
 }
+
+export interface Notification {
+  id: number;
+  company: string;
+  message: string;
+  time: string;
+  status: "viewed" | "invited" | "rejected";
+}
