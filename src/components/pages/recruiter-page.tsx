@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -13,16 +12,34 @@ import type { RankedCandidate } from '@/lib/types';
 import AuthButton from '@/components/auth-button';
 
 export default function RecruiterPage() {
-  const [jobDescription, setJobDescription] = useState('');
+  const [jobInputs, setJobInputs] = useState({
+    jobTitle: '',
+    requiredSkills: '',
+    experienceKeywords: '',
+    technologies: '',
+  });
   const [candidates, setCandidates] = useState<RankedCandidate[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<RankedCandidate | null>(null);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setJobInputs(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
     setCandidates([]);
+    
+    const jobDescription = `
+      Job Title: ${jobInputs.jobTitle}. 
+      Required Skills: ${jobInputs.requiredSkills}. 
+      Experience Keywords: ${jobInputs.experienceKeywords}. 
+      Technologies: ${jobInputs.technologies}.
+    `;
+    
     const result = await getRankedCandidates(jobDescription);
     if ('error' in result) {
       setError(result.error);
@@ -50,8 +67,8 @@ export default function RecruiterPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           <div className="lg:col-span-2">
             <JobDescriptionForm
-              jobDescription={jobDescription}
-              setJobDescription={setJobDescription}
+              jobInputs={jobInputs}
+              onInputChange={handleInputChange}
               onSubmit={handleSubmit}
               isLoading={isLoading}
             />
