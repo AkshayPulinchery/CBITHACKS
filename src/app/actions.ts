@@ -67,7 +67,8 @@ export async function getRankedCandidates(
 
     const sortedCandidates = candidatesWithScores.sort((a, b) => b.totalScore - a.totalScore);
 
-    const rankedCandidatesPromises = sortedCandidates.map(async (candidate, index) => {
+    const rankedCandidates: RankedCandidate[] = [];
+    for (const [index, candidate] of sortedCandidates.entries()) {
       const aiExplanation = await generateCandidateExplanation({
         candidateName: candidate.name,
         candidateScore: Math.round(candidate.totalScore),
@@ -78,7 +79,7 @@ export async function getRankedCandidates(
         candidateLinkedInSkills: candidate.linkedinSkills,
       });
 
-      return {
+      rankedCandidates.push({
         id: candidate.id,
         rank: index + 1,
         name: candidate.name,
@@ -92,12 +93,15 @@ export async function getRankedCandidates(
           github: { ...candidate.details.github, score: Math.round(candidate.details.github.score) },
           linkedin: { ...candidate.details.linkedin, score: Math.round(candidate.details.linkedin.score) },
         },
-      };
-    });
+      });
+    }
 
-    return Promise.all(rankedCandidatesPromises);
+    return rankedCandidates;
   } catch (error) {
     console.error("Error in getRankedCandidates:", error);
+    if (error instanceof Error && error.message.includes('RESOURCE_EXHAUSTED')) {
+      return { error: "The request could not be processed due to API rate limits. Please try again in a few moments." };
+    }
     return { error: "An unexpected error occurred while ranking candidates. Please try again." };
   }
 }
