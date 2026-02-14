@@ -14,7 +14,7 @@ import {
 interface AuthContextType {
   user: AppUser | null;
   loading: boolean;
-  signIn: (email: string, pass: string) => Promise<any>;
+  signIn: (email: string, pass: string) => Promise<AppUser>;
   signUp: (email: string, pass: string, displayName: string) => Promise<any>;
   signOut: () => Promise<void>;
   setUserRole: (role: 'recruiter' | 'job-seeker') => Promise<void>;
@@ -52,8 +52,23 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     return () => unsubscribe();
   }, []);
   
-  const signIn = async (email: string, pass: string) => {
-    return signInWithEmailAndPassword(auth, email, pass);
+  const signIn = async (email: string, pass: string): Promise<AppUser> => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+    const userDocRef = doc(db, 'users', userCredential.user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (userDoc.exists()) {
+      return { uid: userCredential.user.uid, ...userDoc.data() } as AppUser;
+    }
+
+    // Fallback for a user in auth but not firestore (should be rare)
+    return {
+      uid: userCredential.user.uid,
+      email: userCredential.user.email,
+      displayName: userCredential.user.displayName,
+      photoURL: userCredential.user.photoURL,
+      role: null,
+    };
   };
 
   const signUp = async (email: string, pass: string, displayName: string) => {

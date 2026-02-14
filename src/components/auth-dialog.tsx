@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Dialog,
   DialogContent,
@@ -29,6 +30,7 @@ interface AuthDialogProps {
 export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
+  const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,9 +47,17 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
     setIsLoading(true);
     setError(null);
     try {
-      await signIn(signInEmail, signInPassword);
+      const appUser = await signIn(signInEmail, signInPassword);
       onOpenChange(false);
       toast({ title: 'Success', description: 'Logged in successfully.' });
+      
+      if (appUser.role === 'recruiter') {
+        router.push('/recruiter');
+      } else if (appUser.role === 'job-seeker') {
+        router.push('/user');
+      } else {
+        router.push('/role-selection');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to sign in.');
     } finally {
@@ -68,6 +78,7 @@ export function AuthDialog({ open, onOpenChange }: AuthDialogProps) {
       await signUp(signUpEmail, signUpPassword, signUpDisplayName);
       onOpenChange(false);
       toast({ title: 'Success', description: 'Account created successfully.' });
+      router.push('/role-selection');
     } catch (err: any) {
       setError(err.message || 'Failed to sign up.');
     } finally {
