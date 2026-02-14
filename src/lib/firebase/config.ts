@@ -3,15 +3,14 @@ import {initializeApp, getApps, getApp} from 'firebase/app';
 import {getAuth} from 'firebase/auth';
 import {getFirestore} from 'firebase/firestore';
 
-// TODO: Replace with your Firebase project's configuration
-// Go to your project's settings in the Firebase console to find this.
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: 'YOUR_API_KEY',
-  authDomain: 'YOUR_AUTH_DOMAIN',
-  projectId: 'YOUR_PROJECT_ID',
-  storageBucket: 'YOUR_STORAGE_BUCKET',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId: 'YOUR_APP_ID',
+  apiKey: "AIzaSyB_N0N8LeHigseIrz71TN4cKCilaMZf40M",
+  authDomain: "skillrank-ai.firebaseapp.com",
+  projectId: "skillrank-ai",
+  storageBucket: "skillrank-ai.appspot.com",
+  messagingSenderId: "482261842991",
+  appId: "1:482261842991:web:2811b7cbfd0d74e686dada"
 };
 
 // Initialize Firebase
