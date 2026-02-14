@@ -14,6 +14,20 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+interface JobTemplate {
+  id: string;
+  title: string;
+  responsibilities: string;
+  qualifications: string;
+}
 
 interface JobDescriptionFormProps {
   jobDetails: {
@@ -24,6 +38,8 @@ interface JobDescriptionFormProps {
   onJobDetailsChange: (fieldName: string, value: string) => void;
   onSubmit: () => void;
   isLoading: boolean;
+  templates: JobTemplate[];
+  onTemplateSelect: (templateId: string) => void;
 }
 
 export default function JobDescriptionForm({
@@ -31,9 +47,17 @@ export default function JobDescriptionForm({
   onJobDetailsChange,
   onSubmit,
   isLoading,
+  templates,
+  onTemplateSelect,
 }: JobDescriptionFormProps) {
-
   const isSubmitDisabled = isLoading || !jobDetails.title || !jobDetails.qualifications;
+
+  const selectedTemplate = templates.find(
+    (t) =>
+      t.title === jobDetails.title &&
+      t.responsibilities === jobDetails.responsibilities &&
+      t.qualifications === jobDetails.qualifications
+  );
 
   return (
     <Card>
@@ -43,10 +67,30 @@ export default function JobDescriptionForm({
           Job Description
         </CardTitle>
         <CardDescription>
-          Fill out the details for the role you're hiring for.
+          Select a template or fill out the details for the role you're hiring for.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="job-template">Job Template</Label>
+          <Select
+            value={selectedTemplate?.id || ''}
+            onValueChange={onTemplateSelect}
+            disabled={isLoading}
+          >
+            <SelectTrigger id="job-template">
+              <SelectValue placeholder="Select a job template..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">-- Custom Job Description --</SelectItem>
+              {templates.map((template) => (
+                <SelectItem key={template.id} value={template.id}>
+                  {template.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="space-y-2">
           <Label htmlFor="title">Job Title</Label>
           <Input

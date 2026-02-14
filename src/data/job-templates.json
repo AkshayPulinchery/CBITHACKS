@@ -1,0 +1,26 @@
+[
+  {
+    "id": "senior-react-dev",
+    "title": "Senior React Developer",
+    "responsibilities": "Develop and maintain high-quality web applications using React.js. Collaborate with cross-functional teams to define, design, and ship new features. Mentor junior developers and lead code reviews.",
+    "qualifications": "5+ years of professional experience with React.js and the modern JavaScript ecosystem (ES6+, Webpack, Babel). Strong proficiency in TypeScript, Redux, and RESTful APIs. Experience with unit and integration testing using Jest and React Testing Library. Excellent problem-solving skills and ability to work in an agile environment."
+  },
+  {
+    "id": "backend-python-dev",
+    "title": "Backend Python Developer",
+    "responsibilities": "Design and implement scalable backend services and APIs using Python. Work with databases like PostgreSQL and Redis. Write clean, maintainable, and testable code. Deploy and monitor applications on cloud platforms like AWS.",
+    "qualifications": "3+ years of experience with Python and a major web framework (e.g., Django, Flask, FastAPI). Solid understanding of SQL and database design. Experience with containerization (Docker) and CI/CD pipelines. Familiarity with cloud services (AWS, GCP, or Azure)."
+  },
+  {
+    "id": "full-stack-dev",
+    "title": "Full-Stack Developer (MERN)",
+    "responsibilities": "Build and maintain full-stack web applications using the MERN stack (MongoDB, Express, React, Node.js). Design and develop user-facing features and corresponding backend APIs. Ensure the performance, quality, and responsiveness of applications.",
+    "qualifications": "2+ years of experience building applications with the MERN stack. Proficient in JavaScript/TypeScript, React, and Node.js. Experience with NoSQL databases, specifically MongoDB. Understanding of Git, RESTful services, and modern web development principles."
+  },
+  {
+    "id": "data-scientist",
+    "title": "Data Scientist",
+    "responsibilities": "Analyze large, complex datasets to extract valuable insights. Build and deploy machine learning models to solve business problems. Collaborate with stakeholders to understand data requirements and deliver data-driven solutions.",
+    "qualifications": "Proven experience as a Data Scientist or similar role. Strong knowledge of Python and its data science libraries (e.g., Pandas, NumPy, Scikit-learn, TensorFlow/PyTorch). Experience with SQL and data visualization tools (e.g., Tableau, Matplotlib). Solid foundation in statistics and machine learning algorithms."
+  }
+]

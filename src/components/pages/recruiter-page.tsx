@@ -32,6 +32,7 @@ import CandidateDetailsDialog from '@/components/candidate-details-dialog';
 import { getRankedCandidates, getAiChatResponse } from '@/app/actions';
 import type { RankedCandidate } from '@/lib/types';
 import AuthButton from '@/components/auth-button';
+import jobTemplates from '@/data/job-templates.json';
 
 const AITopPick = ({ candidate, onSelect }: { candidate: RankedCandidate, onSelect: (c: RankedCandidate) => void }) => (
     <Card className="mb-4 border-primary/50 border-2 shadow-lg">
@@ -91,7 +92,7 @@ export default function RecruiterPage() {
     setChatLoading(true);
 
     try {
-        const aiResponse = await getAiChatResponse('recruiter-assistant', chatMessages, question);
+        const aiResponse = await getAiChatResponse('recruiter-assistant', [], question);
         setChatMessages(prev => [...prev, { from: 'ai' as const, text: aiResponse }]);
     } catch (error) {
         setChatMessages(prev => [...prev, { from: 'ai' as const, text: 'Sorry, I had trouble responding. Please try again.' }]);
@@ -120,6 +121,21 @@ export default function RecruiterPage() {
 
   const handleJobDetailsChange = (fieldName: string, value: string) => {
     setJobDetails(prev => ({ ...prev, [fieldName]: value }));
+  };
+
+  const handleTemplateSelect = (templateId: string) => {
+    if (!templateId) {
+      setJobDetails({ title: '', responsibilities: '', qualifications: '' });
+      return;
+    }
+    const template = jobTemplates.find((t) => t.id === templateId);
+    if (template) {
+      setJobDetails({
+        title: template.title,
+        responsibilities: template.responsibilities,
+        qualifications: template.qualifications,
+      });
+    }
   };
 
   const handleCandidateSelect = (candidateId: number) => {
@@ -191,6 +207,8 @@ export default function RecruiterPage() {
               onJobDetailsChange={handleJobDetailsChange}
               onSubmit={handleSubmit}
               isLoading={isLoading}
+              templates={jobTemplates}
+              onTemplateSelect={handleTemplateSelect}
             />
              <Card>
               <CardHeader>
