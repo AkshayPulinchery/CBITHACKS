@@ -1,0 +1,66 @@
+[
+  {
+    "id": 1,
+    "name": "Akshay Sharma",
+    "avatarUrl": "https://picsum.photos/seed/avatar1/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 420,
+    "githubRepos": [
+      {"name": "react-portfolio", "tech": ["React", "CSS", "JavaScript"]},
+      {"name": "node-api-boilerplate", "tech": ["Node.js", "Express", "MongoDB"]},
+      {"name": "redux-toolkit-demo", "tech": ["React", "Redux"]},
+      {"name": "data-viz-d3", "tech": ["D3.js", "JavaScript"]}
+    ],
+    "linkedinSkills": ["React", "Node.js", "JavaScript", "Git", "REST APIs", "MongoDB"]
+  },
+  {
+    "id": 2,
+    "name": "Rahul Verma",
+    "avatarUrl": "https://picsum.photos/seed/avatar2/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 650,
+    "githubRepos": [
+      {"name": "competitive-programming", "tech": ["C++"]},
+      {"name": "algo-visualizer", "tech": ["Python", "Flask"]}
+    ],
+    "linkedinSkills": ["C++", "Python", "Data Structures", "Algorithms"]
+  },
+  {
+    "id": 3,
+    "name": "Neha Gupta",
+    "avatarUrl": "https://picsum.photos/seed/avatar3/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 210,
+    "githubRepos": [
+      {"name": "fullstack-ecom", "tech": ["React", "Node.js", "PostgreSQL", "Tailwind CSS"]},
+      {"name": "nextjs-blog", "tech": ["Next.js", "React", "Tailwind CSS"]},
+      {"name": "devops-scripts", "tech": ["Docker", "Bash"]}
+    ],
+    "linkedinSkills": ["React", "Git", "JavaScript", "Next.js", "Tailwind CSS", "SQL"]
+  },
+  {
+    "id": 4,
+    "name": "Priya Singh",
+    "avatarUrl": "https://picsum.photos/seed/avatar4/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 150,
+    "githubRepos": [
+      {"name": "ui-design-system", "tech": ["React", "TypeScript", "Storybook"]},
+      {"name": "mobile-app-rn", "tech": ["React Native", "TypeScript"]}
+    ],
+    "linkedinSkills": ["TypeScript", "React Native", "UI/UX Design", "Figma", "Storybook"]
+  },
+  {
+    "id": 5,
+    "name": "Sanjay Kumar",
+    "avatarUrl": "https://picsum.photos/seed/avatar5/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 300,
+    "githubRepos": [
+      {"name": "cloud-functions-aws", "tech": ["AWS Lambda", "Python", "Serverless"]},
+      {"name": "go-microservice", "tech": ["Go", "gRPC"]},
+      {"name": "kubernetes-config", "tech": ["Kubernetes", "YAML"]}
+    ],
+    "linkedinSkills": ["Go", "Python", "AWS", "Docker", "Kubernetes", "gRPC"]
+  }
+]
