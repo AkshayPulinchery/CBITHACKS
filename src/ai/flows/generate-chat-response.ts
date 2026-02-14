@@ -10,7 +10,6 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import {Message} from 'genkit/model';
 
 export const ChatMessageSchema = z.object({
   role: z.enum(['user', 'model']),
@@ -21,9 +20,9 @@ export type ChatMessage = z.infer<typeof ChatMessageSchema>;
 const ChatResponseInputSchema = z.object({
   context: z
     .enum(['recruiter-assistant', 'career-coach'])
-    .describe('The context that defines the AI\'s persona and purpose.'),
+    .describe("The context that defines the AI's persona and purpose."),
   history: z.array(ChatMessageSchema).describe('The conversation history.'),
-  question: z.string().describe('The user\'s latest question.'),
+  question: z.string().describe("The user's latest question."),
 });
 export type ChatResponseInput = z.infer<typeof ChatResponseInputSchema>;
 
@@ -41,7 +40,7 @@ export async function generateChatResponse(input: ChatResponseInput): Promise<Ch
   const {text} = await ai.generate({
     model: 'googleai/gemini-2.5-flash',
     prompt: question,
-    history: history.map(m => new Message(m.role, m.content)),
+    history: history,
     config: {
       systemPrompt,
     },
