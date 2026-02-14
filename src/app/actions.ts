@@ -52,7 +52,7 @@ export async function getRankedCandidates(
       const matchedSkills = student.linkedinSkills.filter(skill =>
         allJobSkills.includes(skill.toLowerCase())
       );
-      const linkedinScore = (matchedSkills.length / allJobSkills.length) * 100;
+      const linkedinScore = allJobSkills.length > 0 ? (matchedSkills.length / allJobSkills.length) * 100 : 0;
       
       const totalScore = 
         leetCodeScore * WEIGHTS.leetCode +
@@ -113,19 +113,13 @@ export async function getRankedCandidates(
 
 export async function getAiChatResponse(
   context: 'recruiter-assistant' | 'career-coach',
-  history: { from: 'user' | 'ai'; text: string }[],
+  history: ChatMessage[],
   question: string
 ): Promise<string> {
   try {
-    // Convert frontend message format to Genkit's expected format
-    const genkitHistory: ChatMessage[] = history.map(msg => ({
-      role: msg.from === 'user' ? 'user' : 'model',
-      content: [{ text: msg.text }],
-    }));
-
     const response = await generateChatResponse({
       context,
-      history: genkitHistory,
+      history: history,
       question,
     });
     return response;
@@ -166,4 +160,58 @@ export async function getMockNotifications(
       },
     ];
   }
+}
+
+export async function getUserProfileData(
+  // In a real app, you'd use the userId to find the correct user
+  userId: string
+): Promise<Student> {
+  // For demonstration, we'll always return the first student
+  // to represent the logged-in user.
+  const students: Student[] = studentsData;
+  return students[0];
+}
+
+export async function getProfileStrengthScore(
+  userId: string
+): Promise<{ score: number, summary: string }> {
+    const students: Student[] = studentsData;
+    // For demo, we use the first student as the logged-in user
+    const currentUser = students[0]; 
+
+    const maxLeetCode = Math.max(...students.map(s => s.leetcodeSolved), 1);
+    const maxGithubRepos = Math.max(...students.map(s => s.githubRepos.length), 1);
+    const maxLinkedinSkills = Math.max(...students.map(s => s.linkedinSkills.length), 1);
+
+    const leetCodeScore = (currentUser.leetcodeSolved / maxLeetCode) * 100;
+    const githubScore = (currentUser.githubRepos.length / maxGithubRepos) * 100;
+    const linkedinScore = (currentUser.linkedinSkills.length / maxLinkedinSkills) * 100;
+
+    const totalScore = 
+        leetCodeScore * WEIGHTS.leetCode +
+        githubScore * WEIGHTS.github +
+        linkedinScore * WEIGHTS.linkedin;
+
+    // Generate a simple summary
+    let summary = 'Well-rounded profile';
+    const scores = {
+        'Software Development': githubScore,
+        'Problem Solving': leetCodeScore,
+        'Professional Skills': linkedinScore,
+    };
+
+    const topCategory = Object.keys(scores).reduce((a, b) => scores[a as keyof typeof scores] > scores[b as keyof typeof scores] ? a : b);
+
+    if (totalScore > 75) {
+        summary = `Excellent profile with strong ${topCategory} skills.`;
+    } else if (totalScore > 50) {
+        summary = `Solid profile with good ${topCategory} skills.`;
+    } else {
+        summary = `Profile with potential, especially in ${topCategory}.`;
+    }
+
+    return {
+        score: Math.round(totalScore),
+        summary: summary,
+    };
 }

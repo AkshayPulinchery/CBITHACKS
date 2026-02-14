@@ -122,5 +122,130 @@
       {"name": "cypress-e2e-tests", "tech": ["Cypress", "JavaScript", "TypeScript"]}
     ],
     "linkedinSkills": ["QA Automation", "Selenium", "Cypress", "Java", "JavaScript", "CI/CD"]
+  },
+  {
+    "id": 11,
+    "name": "Rohan Patel",
+    "avatarUrl": "https://picsum.photos/seed/avatar11/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 450,
+    "githubRepos": [
+      {"name": "spring-security-jwt", "tech": ["Java", "Spring Boot", "JWT"]},
+      {"name": "hibernate-performance-tuning", "tech": ["Java", "Hibernate", "JPA"]},
+      {"name": "kafka-producer-consumer", "tech": ["Java", "Apache Kafka"]}
+    ],
+    "linkedinSkills": ["Java", "Spring Boot", "Microservices", "Hibernate", "JPA", "SQL"]
+  },
+  {
+    "id": 12,
+    "name": "Sneha Menon",
+    "avatarUrl": "https://picsum.photos/seed/avatar12/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 120,
+    "githubRepos": [
+      {"name": "typescript-design-patterns", "tech": ["TypeScript", "Node.js"]},
+      {"name": "graphql-server-apollo", "tech": ["GraphQL", "Apollo Server", "Node.js"]}
+    ],
+    "linkedinSkills": ["TypeScript", "JavaScript", "React", "Node.js", "GraphQL"]
+  },
+  {
+    "id": 13,
+    "name": "Arjun Reddy",
+    "avatarUrl": "https://picsum.photos/seed/avatar13/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 700,
+    "githubRepos": [
+      {"name": "django-rest-framework-api", "tech": ["Python", "Django", "DRF"]},
+      {"name": "celery-task-queue", "tech": ["Python", "Celery", "Redis"]},
+      {"name": "fastapi-crud-app", "tech": ["Python", "FastAPI"]}
+    ],
+    "linkedinSkills": ["Python", "Django", "Flask", "FastAPI", "Data Structures", "Algorithms"]
+  },
+  {
+    "id": 14,
+    "name": "Pooja Mehta",
+    "avatarUrl": "https://picsum.photos/seed/avatar14/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 55,
+    "githubRepos": [
+      {"name": "figma-to-code-portfolio", "tech": ["HTML", "SCSS", "JavaScript"]},
+      {"name": "web-accessibility-guide", "tech": ["HTML", "WCAG"]}
+    ],
+    "linkedinSkills": ["UI/UX Design", "Figma", "Adobe XD", "User Research", "Wireframing"]
+  },
+  {
+    "id": 15,
+    "name": "Alok Nath",
+    "avatarUrl": "https://picsum.photos/seed/avatar15/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 320,
+    "githubRepos": [
+      {"name": "mern-stack-social-media", "tech": ["MongoDB", "Express", "React", "Node.js"]},
+      {"name": "webpack-from-scratch", "tech": ["Webpack", "Babel", "JavaScript"]}
+    ],
+    "linkedinSkills": ["React", "Node.js", "MongoDB", "Express", "JavaScript", "MERN"]
+  },
+  {
+    "id": 16,
+    "name": "Deepa Iyer",
+    "avatarUrl": "https://picsum.photos/seed/avatar16/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 280,
+    "githubRepos": [
+      {"name": "sql-query-challenges", "tech": ["SQL", "PostgreSQL"]},
+      {"name": "tableau-dashboard-project", "tech": ["Tableau"]},
+      {"name": "power-bi-sales-report", "tech": ["Power BI"]}
+    ],
+    "linkedinSkills": ["SQL", "Data Analysis", "Tableau", "Power BI", "Excel", "Statistics"]
+  },
+  {
+    "id": 17,
+    "name": "Karan Malhotra",
+    "avatarUrl": "https://picsum.photos/seed/avatar17/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 190,
+    "githubRepos": [
+      {"name": "react-native-maps-app", "tech": ["React Native", "TypeScript", "Firebase"]},
+      {"name": "swift-ios-todo", "tech": ["Swift", "iOS", "Xcode"]}
+    ],
+    "linkedinSkills": ["React Native", "iOS Development", "Android Development", "Swift", "Kotlin"]
+  },
+  {
+    "id": 18,
+    "name": "Riya Sharma",
+    "avatarUrl": "https://picsum.photos/seed/avatar18/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 500,
+    "githubRepos": [
+      {"name": "rust-cli-tool", "tech": ["Rust"]},
+      {"name": "system-design-primer-notes", "tech": ["System Design"]},
+      {"name": "distributed-cache-impl", "tech": ["Go", "Concurrency"]}
+    ],
+    "linkedinSkills": ["Go", "Python", "Rust", "System Design", "Distributed Systems", "PostgreSQL"]
+  },
+  {
+    "id": 19,
+    "name": "Harish Kumar",
+    "avatarUrl": "https://picsum.photos/seed/avatar19/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 90,
+    "githubRepos": [
+      {"name": "terraform-aws-infra", "tech": ["Terraform", "AWS", "HCL"]},
+      {"name": "ansible-playbooks", "tech": ["Ansible", "YAML"]},
+      {"name": "jenkins-ci-cd-pipeline", "tech": ["Jenkins", "Groovy"]}
+    ],
+    "linkedinSkills": ["DevOps", "CI/CD", "AWS", "Terraform", "Ansible", "Docker", "Kubernetes"]
+  },
+  {
+    "id": 20,
+    "name": "Meera Krishnan",
+    "avatarUrl": "https://picsum.photos/seed/avatar20/100/100",
+    "dataAiHint": "person portrait",
+    "leetcodeSolved": 220,
+    "githubRepos": [
+      {"name": "angular-material-components", "tech": ["Angular", "TypeScript", "Angular Material"]},
+      {"name": "ngrx-entity-example", "tech": ["Angular", "NgRx", "TypeScript"]}
+    ],
+    "linkedinSkills": ["Angular", "TypeScript", "NgRx", "RxJS", "JavaScript", "HTML"]
   }
 ]

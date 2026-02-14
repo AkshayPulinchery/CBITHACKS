@@ -32,41 +32,48 @@ import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState, useEffect } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getAiChatResponse, getProfileAnalysis, getMockNotifications } from '@/app/actions';
-import type { Notification } from '@/lib/types';
+import { getAiChatResponse, getProfileAnalysis, getMockNotifications, getUserProfileData, getProfileStrengthScore } from '@/app/actions';
+import type { Notification, Student } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
-function ProfileLinkInput({
+
+function ProfileLinkDisplay({
   icon,
-  id,
   label,
-  placeholder,
+  value,
+  url
 }: {
   icon: React.ReactNode;
-  id: string;
   label: string;
-  placeholder: string;
+  value: string;
+  url: string;
 }) {
   return (
     <div className="flex items-center gap-4">
       <div className="bg-muted p-3 rounded-full">{icon}</div>
       <div className="flex-grow">
-        <Label htmlFor={id} className="text-sm font-medium">
+        <Label className="text-sm font-medium">
           {label}
         </Label>
-        <Input id={id} placeholder={placeholder} className="mt-1" />
+         <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline mt-1 block">
+          {value || 'Not connected'}
+        </a>
       </div>
     </div>
   );
 }
 
+
 function DocumentUpload({
   icon,
   title,
   description,
+  onClick,
 }: {
   icon: React.ReactNode;
   title: string;
   description: string;
+  onClick: () => void;
 }) {
   return (
     <div className="flex items-center gap-4 rounded-lg border p-4">
@@ -75,7 +82,7 @@ function DocumentUpload({
             <h4 className="font-semibold">{title}</h4>
             <p className="text-sm text-muted-foreground">{description}</p>
         </div>
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" onClick={onClick}>
             <Upload className="mr-2 h-4 w-4" />
             Upload
         </Button>
@@ -86,8 +93,14 @@ function DocumentUpload({
 
 export default function UserPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   
+  const [profileData, setProfileData] = useState<Student | null>(null);
+  const [profileScore, setProfileScore] = useState(0);
+  const [scoreSummary, setScoreSummary] = useState('');
   const [analysis, setAnalysis] = useState('');
+
+  const [scoreLoading, setScoreLoading] = useState(true);
   const [analysisLoading, setAnalysisLoading] = useState(true);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(true);
@@ -99,17 +112,34 @@ export default function UserPage() {
   const [chatLoading, setChatLoading] = useState(false);
 
   useEffect(() => {
-    if (user?.displayName) {
+    if (user?.uid) {
+        setScoreLoading(true);
         setAnalysisLoading(true);
         setNotificationsLoading(true);
+        
+        getUserProfileData(user.uid).then(setProfileData);
 
-        getProfileAnalysis(user.displayName, 'Excellent Match for Frontend Roles')
-            .then(setAnalysis)
-            .finally(() => setAnalysisLoading(false));
+        getProfileStrengthScore(user.uid).then(result => {
+            setProfileScore(result.score);
+            setScoreSummary(result.summary);
+            setScoreLoading(false);
 
-        getMockNotifications(user.displayName)
-            .then(setNotifications)
-            .finally(() => setNotificationsLoading(false));
+            if (user.displayName) {
+                 getProfileAnalysis(user.displayName, result.summary)
+                    .then(setAnalysis)
+                    .finally(() => setAnalysisLoading(false));
+            } else {
+                setAnalysisLoading(false);
+            }
+        });
+
+        if (user.displayName) {
+            getMockNotifications(user.displayName)
+                .then(setNotifications)
+                .finally(() => setNotificationsLoading(false));
+        } else {
+            setNotificationsLoading(false);
+        }
     }
   }, [user]);
 
@@ -132,6 +162,16 @@ export default function UserPage() {
       setChatLoading(false);
     }
   };
+  
+  const handleUploadClick = () => {
+    toast({
+      title: "Feature in development",
+      description: "Document analysis is coming soon!",
+      variant: 'default',
+    });
+  };
+
+  const profileSlug = profileData?.name.toLowerCase().replace(/\s+/g, '-') || '';
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
@@ -154,7 +194,7 @@ export default function UserPage() {
                 <Card>
                     <CardHeader className="text-center items-center">
                         <Avatar className="w-24 h-24 mb-4">
-                            <AvatarImage src={user?.photoURL || ''} alt={user?.displayName || ''} />
+                            <AvatarImage src={user?.photoURL || profileData?.avatarUrl} alt={user?.displayName || ''} />
                             <AvatarFallback className="text-4xl">{user?.displayName?.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <CardTitle className="font-headline text-2xl">{user?.displayName || 'Job Seeker'}</CardTitle>
@@ -164,11 +204,20 @@ export default function UserPage() {
                 <Card className="text-center">
                     <CardHeader>
                         <CardTitle className="font-headline">Your SkillRank Score</CardTitle>
-                        <CardDescription>Based on your profile and documents.</CardDescription>
+                        <CardDescription>An estimate of your profile strength.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-6xl font-bold text-primary">88</div>
-                        <p className="text-muted-foreground mt-2">Excellent Match for Frontend Roles</p>
+                       {scoreLoading ? (
+                         <div className="space-y-2">
+                           <Skeleton className="h-16 w-24 mx-auto" />
+                           <Skeleton className="h-4 w-48 mx-auto" />
+                         </div>
+                        ) : (
+                          <>
+                            <div className="text-6xl font-bold text-primary">{profileScore}</div>
+                            <p className="text-muted-foreground mt-2">{scoreSummary}</p>
+                          </>
+                        )}
                     </CardContent>
                 </Card>
             </div>
@@ -178,27 +227,37 @@ export default function UserPage() {
                  <Card>
                     <CardHeader>
                         <CardTitle className="font-headline">Your Professional Profiles</CardTitle>
-                        <CardDescription>Link your profiles to improve your score.</CardDescription>
+                        <CardDescription>Connect your profiles to improve your score.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                       <ProfileLinkInput 
-                            icon={<Linkedin className="w-6 h-6 text-primary" />}
-                            id="linkedin"
-                            label="LinkedIn Profile"
-                            placeholder="https://linkedin.com/in/your-profile"
-                       />
-                        <ProfileLinkInput 
-                            icon={<Github className="w-6 h-6 text-primary" />}
-                            id="github"
-                            label="GitHub Profile"
-                            placeholder="https://github.com/your-username"
-                       />
-                       <ProfileLinkInput 
-                            icon={<Code className="w-6 h-6 text-primary" />}
-                            id="leetcode"
-                            label="LeetCode Profile"
-                            placeholder="https://leetcode.com/your-username"
-                       />
+                      {!profileData ? (
+                        <div className="space-y-4">
+                          <Skeleton className="h-12 w-full" />
+                          <Skeleton className="h-12 w-full" />
+                          <Skeleton className="h-12 w-full" />
+                        </div>
+                      ) : (
+                        <>
+                          <ProfileLinkDisplay 
+                              icon={<Linkedin className="w-6 h-6 text-primary" />}
+                              label="LinkedIn Profile"
+                              value={`linkedin.com/in/${profileSlug}`}
+                              url={`https://linkedin.com/in/${profileSlug}`}
+                          />
+                          <ProfileLinkDisplay
+                              icon={<Github className="w-6 h-6 text-primary" />}
+                              label="GitHub Profile"
+                              value={`github.com/${profileSlug}`}
+                              url={`https://github.com/${profileSlug}`}
+                          />
+                          <ProfileLinkDisplay
+                              icon={<Code className="w-6 h-6 text-primary" />}
+                              label="LeetCode Profile"
+                              value={`leetcode.com/${profileSlug}`}
+                              url={`https://leetcode.com/${profileSlug}`}
+                          />
+                        </>
+                      )}
                     </CardContent>
                 </Card>
 
@@ -212,11 +271,13 @@ export default function UserPage() {
                             icon={<FileText className="w-6 h-6 text-primary" />}
                             title="Your Resume"
                             description="Upload your latest resume (PDF, DOCX)."
+                            onClick={handleUploadClick}
                         />
                          <DocumentUpload
                             icon={<Award className="w-6 h-6 text-primary" />}
                             title="Certifications"
                             description="Upload any relevant certificates."
+                            onClick={handleUploadClick}
                         />
                     </CardContent>
                 </Card>
