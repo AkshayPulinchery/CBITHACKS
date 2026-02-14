@@ -12,18 +12,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { LogIn, Loader2 } from 'lucide-react';
 
 export default function AuthButton() {
-  const { user, loading, signInWithGoogle, signOut, setUserRole } = useAuth();
+  const { user, loading, signInWithGoogle, signOut } = useAuth();
 
   if (loading) {
     return (
@@ -42,26 +34,9 @@ export default function AuthButton() {
       </Button>
     );
   }
-  
-  const showRoleDialog = user && !user.role;
 
   return (
     <>
-      <AlertDialog open={showRoleDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Welcome to SkillRank AI!</AlertDialogTitle>
-            <AlertDialogDescription>
-              To get started, please select your role. This will help us tailor your experience.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="sm:justify-center flex-row gap-2">
-            <Button onClick={() => setUserRole('recruiter')} className="w-full sm:w-auto">I'm a Recruiter</Button>
-            <Button onClick={() => setUserRole('job-seeker')} className="w-full sm:w-auto" variant="secondary">I'm a Job Seeker</Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="relative h-10 w-10 rounded-full">
