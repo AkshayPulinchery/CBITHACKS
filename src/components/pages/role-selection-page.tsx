@@ -1,7 +1,6 @@
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -28,27 +27,19 @@ export default function RoleSelectionPage() {
     const router = useRouter();
     const [selectedRole, setSelectedRole] = useState<'recruiter' | 'job-seeker' | null>(null);
 
-    if (authLoading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-background">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-        )
-    }
+    useEffect(() => {
+        if (authLoading) return; // Wait until auth state is determined
 
-    if (!authLoading && !user) {
-        router.replace('/');
-        return null;
-    }
-    
-    if (user?.role) {
-        if (user.role === 'recruiter') {
-            router.replace('/recruiter');
-        } else if (user.role === 'job-seeker') {
-            router.replace('/user');
+        if (!user) {
+            router.replace('/');
+        } else if (user.role) {
+            if (user.role === 'recruiter') {
+                router.replace('/recruiter');
+            } else if (user.role === 'job-seeker') {
+                router.replace('/user');
+            }
         }
-        return null;
-    }
+    }, [user, authLoading, router]);
 
     const handleRoleSelect = async (role: 'recruiter' | 'job-seeker') => {
         if (selectedRole) return;
@@ -65,6 +56,14 @@ export default function RoleSelectionPage() {
             setSelectedRole(null);
         }
     };
+    
+    if (authLoading || !user || user.role) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-muted/30 flex flex-col">
