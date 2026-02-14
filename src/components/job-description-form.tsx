@@ -59,6 +59,8 @@ export default function JobDescriptionForm({
       t.qualifications === jobDetails.qualifications
   );
 
+  const selectValue = selectedTemplate?.id || 'custom';
+
   return (
     <Card>
       <CardHeader>
@@ -74,7 +76,7 @@ export default function JobDescriptionForm({
         <div className="space-y-2">
           <Label htmlFor="job-template">Job Template</Label>
           <Select
-            value={selectedTemplate?.id || ''}
+            value={selectValue}
             onValueChange={onTemplateSelect}
             disabled={isLoading}
           >
@@ -82,7 +84,7 @@ export default function JobDescriptionForm({
               <SelectValue placeholder="Select a job template..." />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">-- Custom Job Description --</SelectItem>
+              <SelectItem value="custom">-- Custom Job Description --</SelectItem>
               {templates.map((template) => (
                 <SelectItem key={template.id} value={template.id}>
                   {template.title}

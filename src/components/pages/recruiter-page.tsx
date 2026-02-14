@@ -124,7 +124,7 @@ export default function RecruiterPage() {
   };
 
   const handleTemplateSelect = (templateId: string) => {
-    if (!templateId) {
+    if (templateId === 'custom') {
       setJobDetails({ title: '', responsibilities: '', qualifications: '' });
       return;
     }
