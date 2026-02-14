@@ -1,11 +1,9 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
-import { UsersRound, AlertCircle, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { UsersRound, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import JobDescriptionForm from '@/components/job-description-form';
 import CandidateTable from '@/components/candidate-table';
@@ -13,7 +11,6 @@ import CandidateDetailsDialog from '@/components/candidate-details-dialog';
 import { getRankedCandidates } from '@/app/actions';
 import type { RankedCandidate } from '@/lib/types';
 import AuthButton from '@/components/auth-button';
-import { useAuth } from '@/contexts/auth-context';
 
 export default function RecruiterPage() {
   const [jobDescription, setJobDescription] = useState('');
@@ -21,20 +18,6 @@ export default function RecruiterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<RankedCandidate | null>(null);
-
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      router.replace('/');
-    } else if (!user.role) {
-      router.replace('/role-selection');
-    } else if (user.role !== 'recruiter') {
-      router.replace('/user');
-    }
-  }, [user, authLoading, router]);
 
   const handleSubmit = async () => {
     setIsLoading(true);
@@ -48,14 +31,6 @@ export default function RecruiterPage() {
     }
     setIsLoading(false);
   };
-
-  if (authLoading || !user || user.role !== 'recruiter') {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">

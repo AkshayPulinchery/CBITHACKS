@@ -1,36 +1,14 @@
 
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { UsersRound, User, Loader2 } from 'lucide-react';
+import { UsersRound, User } from 'lucide-react';
 import AuthButton from '@/components/auth-button';
 import { useAuth } from '@/contexts/auth-context';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 export default function UserPage() {
-  const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user) {
-      router.replace('/');
-    } else if (!user.role) {
-      router.replace('/role-selection');
-    } else if (user.role !== 'job-seeker') {
-      router.replace('/recruiter');
-    }
-  }, [user, authLoading, router]);
-
-  if (authLoading || !user || user.role !== 'job-seeker') {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col">
@@ -54,7 +32,7 @@ export default function UserPage() {
                     Job Seeker Dashboard
                 </CardTitle>
                 <CardDescription>
-                    Welcome, {user.displayName}! This is your personal dashboard.
+                    Welcome, {user?.displayName || 'Guest'}! This is your personal dashboard.
                 </CardDescription>
             </CardHeader>
             <CardContent>
